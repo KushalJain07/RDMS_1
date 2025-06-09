@@ -6,10 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  SafeAreaView
+  SafeAreaView,
+  Alert
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+
 
 const CreateDelivery = () => {
   const navigation = useNavigation();
@@ -22,11 +25,28 @@ const CreateDelivery = () => {
     contactNumber: ''
   });
 
-  const handleSubmit = () => {
-    // Handle form submission logic here
-    console.log('Delivery Details:', deliveryDetails);
-    navigation.goBack();
-  };
+  function handleSubmit(){
+    const data = {
+        pname: deliveryDetails.partyName,
+        address: deliveryDetails.address,
+        material: deliveryDetails.material,
+        // quantity: deliveryDetails.quantity,
+        // expectedDeliveryDate: deliveryDetails.expectedDeliveryDate,
+        // contactNumber: deliveryDetails.contactNumber
+    }
+
+    
+    axios.post('http://192.168.77.238:5001/register', data)  // Added data parameter
+        .then((response) => {
+            console.log('Delivery created successfully:', response.data);
+            Alert.alert('Success', 'Delivery created successfully!');
+            navigation.goBack();
+        })
+        .catch((error) => {
+            console.error('Error creating delivery:', error);
+            Alert.alert('Error', 'Failed to create delivery');
+        });
+    }
 
   return (
     <SafeAreaView style={styles.container}>
