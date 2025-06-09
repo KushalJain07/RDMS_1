@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const DeliveryDetailsScreen = () => {
-
   const navigation = useNavigation();
+
   // Dummy orders data
   const orders = [
     {
@@ -50,6 +51,16 @@ const DeliveryDetailsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Icon 
+          name="arrow-back" 
+          size={24} 
+          color="#fff" 
+          onPress={() => navigation.goBack()} 
+        />
+        <Text style={styles.headerTitle}>Delivery Details</Text>
+        <View style={styles.notificationDot} />
+      </View>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.headerTitle}>Delivery Details</Text>
 
@@ -88,10 +99,19 @@ const DeliveryDetailsScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f0f4f7' },
   content: { padding: 20 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    backgroundColor: '#007B7F',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
   headerTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#007B7F',
+    color: '#fff',
     marginBottom: 20,
     textAlign: 'center',
   },

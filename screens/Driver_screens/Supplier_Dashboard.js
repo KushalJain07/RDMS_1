@@ -34,7 +34,7 @@ const navigation = useNavigation();
         <View style={styles.deliveryItem}>
           <Text style={styles.deliveryName}>Send Chanakpur</Text>
           <Text style={styles.deliveryDescription}>3000 nos of bricks</Text>
-          <TouchableOpacity onPress={()=>navigation.navigate(DeliveryDetailsScreen)}>
+          <TouchableOpacity onPress={() => navigation.navigate('DeliveryDetailsScreen')}>
             <Text style={styles.link}>Web link</Text>
           </TouchableOpacity>
         </View>

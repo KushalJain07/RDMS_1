@@ -12,17 +12,15 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function LoginScreen() {
   const navigation = useNavigation();
-  const [selectedRole, setSelectedRole] = useState('Driver');
+  const [selectedRole, setSelectedRole] = useState('Create Delivery');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    if (selectedRole === 'Driver') {
-      navigation.navigate('DriverDashboard');
+    if (selectedRole === 'Create Delivery') {
+      navigation.navigate('CreateDelivery');
     } else if (selectedRole === 'Supplier') {
       navigation.navigate('Supplier_Dashboard');
-    } else {
-      navigation.navigate('CustomerDashboard');
     }
   };
 
@@ -38,9 +36,8 @@ export default function LoginScreen() {
 
         <Text style={styles.loginHeading}>LOG IN</Text>
 
-        {/* Role Selection */}
         <View style={styles.radioGroup}>
-          {['Driver', 'Supplier', 'Customer'].map(role => (
+          {['Create Delivery', 'Supplier'].map(role => (
             <TouchableOpacity
               key={role}
               style={styles.radioButton}
@@ -54,7 +51,6 @@ export default function LoginScreen() {
           ))}
         </View>
 
-        {/* Inputs */}
         <TextInput
           placeholder="Username"
           style={styles.input}
@@ -69,7 +65,6 @@ export default function LoginScreen() {
           onChangeText={setPassword}
         />
 
-        {/* Login Button */}
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Log in</Text>
         </TouchableOpacity>
