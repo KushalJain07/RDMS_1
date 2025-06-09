@@ -9,13 +9,13 @@ import {
   SafeAreaView 
 } from 'react-native';
 
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
 
-type MapScreenProps = {
-  navigation: StackNavigationProp<any>;
-};
+// import { StackNavigationProp } from '@react-navigation/stack';
 
-const MapScreen = ({ navigation }: MapScreenProps) => {
+export default function MapScreen(){
+
+const navigation = useNavigation();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.detailsContainer}>
@@ -82,5 +82,3 @@ const styles = StyleSheet.create({
     marginTop: 4,
   }
 });
-
-export default MapScreen;

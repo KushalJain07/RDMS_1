@@ -1,3 +1,6 @@
+import Icon from 'react-native-vector-icons/Ionicons';
+
+import SignatureScreen from 'react-native-signature-canvas';
 import React, { useRef, useState } from 'react';
 import {
   View,
@@ -9,13 +12,29 @@ import {
   Alert,
   StatusBar,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import SignatureScreen from 'react-native-signature-canvas';
+import { useNavigation } from '@react-navigation/native';
+import MapScreen from './MapScreen';
 
-const DeliveryNoteScreen = () => {
+
+
+export default function DeliveryNoteScreen () {
+
+const navigation = useNavigation();
+
+
+
   const [signature, setSignature] = useState(null);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const signatureRef = useRef();
+
+  function handleNavigation(screenName) {
+    navigation.navigate(screenName);
+
+    
+  }
+
+
+
 
   const handleSignature = (signature) => {
     setSignature(signature);
@@ -40,7 +59,7 @@ const DeliveryNoteScreen = () => {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton}>
-            <Icon name="arrow-back" size={24} color="#fff" />
+            <Icon name="add-circle" size={24} color="#fff" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
             <Text style={styles.headerTitle}>NEW DELIVERY NOTE</Text>
@@ -54,7 +73,7 @@ const DeliveryNoteScreen = () => {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Party Name</Text>
             <View style={styles.inputContainer}>
-              <Icon name="person-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+              <Icon name="people-outline" size={20} color="#6B7280" style={styles.inputIcon} />
               <TextInput 
                 placeholder="Enter party name" 
                 style={styles.input}
@@ -172,7 +191,8 @@ const DeliveryNoteScreen = () => {
           </View>
 
           {/* Capture Location Button */}
-          <TouchableOpacity style={styles.locationButton} >
+          <TouchableOpacity style={styles.locationButton} 
+            onPress={()=>navigation.navigate(MapScreen)}>
             <Icon name="navigate-outline" size={24} color="#fff" />
             <Text style={styles.locationText}>Capture Current Location</Text>
           </TouchableOpacity>
@@ -406,5 +426,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DeliveryNoteScreen;
+
 
