@@ -18,7 +18,7 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
     if (selectedRole === 'Driver') {
-      navigation.navigate('Supplier_Dashboard');
+      navigation.navigate('Driver_Dashboard');
     } else if (selectedRole === 'Supplier') {
       navigation.navigate('DeliveryNoteScreen');
     }

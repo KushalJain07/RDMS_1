@@ -2,7 +2,7 @@ import React from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import DeliveryNoteScreen from './screens/Driver_screens/DeliveryNoteScreen';
 import MapScreen from './screens/Driver_screens/MapScreen';
-import Supplier_Dashboard from './screens/Driver_screens/Driver_Dashboard';
+import Driver_Dashboard from './screens/Driver_screens/Driver_Dashboard';
 import DeliveryDetailsScreen from './screens/Driver_screens/DeliveryDetailsScreen';
 import LoginScreen from './screens/Driver_screens/LoginScreen';
 import CreateDelivery from './screens/Driver_screens/CreateDelivery';
@@ -21,7 +21,7 @@ const App = () => {
         >
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
           <Stack.Screen name="CreateDelivery" component={CreateDelivery} />
-          <Stack.Screen name="Supplier_Dashboard" component={Supplier_Dashboard} />
+          <Stack.Screen name="Driver_Dashboard" component={Driver_Dashboard} />
           <Stack.Screen name="DeliveryDetailsScreen" component={DeliveryDetailsScreen} />
           <Stack.Screen name="MapScreen" component={MapScreen} />
           <Stack.Screen name="DeliveryNoteScreen" component={DeliveryNoteScreen} />

@@ -6,7 +6,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import DeliveryDetailsScreen from './DeliveryDetailsScreen';
 
-const Supplier_Dashboard = () => {
+const Driver_Dashboard = () => {
 
 const navigation = useNavigation();
   return (
@@ -149,5 +149,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Supplier_Dashboard;
+export default Driver_Dashboard;
 
