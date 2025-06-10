@@ -1,4 +1,3 @@
-{/*wee actually dont need this as we have DeliveryNoteScreen but thanks!  */}
 
 import React, { useState } from 'react';
 import {

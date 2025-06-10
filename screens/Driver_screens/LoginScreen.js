@@ -7,14 +7,16 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  Modal,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function LoginScreen() {
   const navigation = useNavigation();
-  const [selectedRole, setSelectedRole] = useState('Create Delivery');
+  const [selectedRole, setSelectedRole] = useState('Driver');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleLogin = () => {
     if (selectedRole === 'Driver') {
@@ -22,6 +24,10 @@ export default function LoginScreen() {
     } else if (selectedRole === 'Supplier') {
       navigation.navigate('DeliveryNoteScreen');
     }
+  };
+
+  const handleForgotPassword = () => {
+    setIsModalVisible(true);
   };
 
   return (
@@ -34,19 +40,26 @@ export default function LoginScreen() {
           />
         </View>
 
-        <Text style={styles.loginHeading}>LOG IN</Text>
+        <Text style={styles.signInHeading}>Sign in</Text>
 
-        <View style={styles.radioGroup}>
+        <View style={styles.toggleContainer}>
           {['Driver', 'Supplier'].map(role => (
             <TouchableOpacity
               key={role}
-              style={styles.radioButton}
+              style={[
+                styles.toggleButton,
+                selectedRole === role && styles.toggleButtonSelected,
+              ]}
               onPress={() => setSelectedRole(role)}
             >
-              <View style={styles.outerCircle}>
-                {selectedRole === role && <View style={styles.innerCircle} />}
-              </View>
-              <Text style={styles.radioLabel}>{role}</Text>
+              <Text
+                style={[
+                  styles.toggleButtonText,
+                  selectedRole === role && styles.toggleButtonTextSelected,
+                ]}
+              >
+                {role}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -69,9 +82,35 @@ export default function LoginScreen() {
           <Text style={styles.loginButtonText}>Log in</Text>
         </TouchableOpacity>
 
-        <Text style={styles.link}>Forgot password?</Text>
+        <TouchableOpacity onPress={handleForgotPassword}>
+          <Text style={styles.link}>Forgot password?</Text>
+        </TouchableOpacity>
+
         <Text style={styles.link}>Sign up</Text>
       </View>
+
+      {/* Forgot Password Modal */}
+      <Modal
+        visible={isModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Forgot Password</Text>
+            <Text style={styles.modalMessage}>
+              Sorry, I think there is no way around this!
+            </Text>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setIsModalVisible(false)}
+            >
+              <Text style={styles.modalCloseButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -81,6 +120,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     backgroundColor: '#F3F4F6',
+    paddingVertical: 20, // Added vertical padding for extra spacing
   },
   container: {
     padding: 30,
@@ -94,7 +134,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 30, // increased spacing
   },
   logo: {
     width: 100,
@@ -104,57 +144,43 @@ const styles = StyleSheet.create({
     borderColor: '#4F46E5',
     backgroundColor: '#fff',
   },
-  loginHeading: {
+  signInHeading: {
     alignSelf: 'center',
-    backgroundColor: '#4F46E5',
-    color: '#fff',
-    paddingVertical: 10,
-    paddingHorizontal: 30,
-    borderRadius: 30,
-    fontSize: 20,
+    color: '#1F2937',
+    fontSize: 24,
     fontWeight: '700',
-    marginBottom: 25,
-    textAlign: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    marginBottom: 30,
   },
-  radioGroup: {
+  toggleContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 20,
+    justifyContent: 'space-evenly',
+    marginBottom: 30, // increased spacing
+    backgroundColor: '#E5E7EB',
+    borderRadius: 8,
+    padding: 4,
   },
-  radioButton: {
-    flexDirection: 'row',
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 6,
     alignItems: 'center',
   },
-  outerCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#4F46E5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  innerCircle: {
-    height: 10,
-    width: 10,
-    borderRadius: 5,
+  toggleButtonSelected: {
     backgroundColor: '#4F46E5',
   },
-  radioLabel: {
+  toggleButtonText: {
     fontSize: 16,
-    color: '#374151',
     fontWeight: '600',
+    color: '#374151',
+  },
+  toggleButtonTextSelected: {
+    color: '#FFFFFF',
   },
   input: {
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 12,
-    marginBottom: 15,
+    marginBottom: 20,
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#D1D5DB',
@@ -175,8 +201,42 @@ const styles = StyleSheet.create({
   link: {
     textAlign: 'center',
     color: '#4F46E5',
-    marginTop: 15,
+    marginTop: 20,
     fontSize: 14,
     textDecorationLine: 'underline',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    margin: 30,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 14,
+    color: '#374151',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalCloseButton: {
+    backgroundColor: '#4F46E5',
+    borderRadius: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  modalCloseButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

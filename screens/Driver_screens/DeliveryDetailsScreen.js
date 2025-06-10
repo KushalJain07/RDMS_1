@@ -1,13 +1,24 @@
 // DeliveryDetailsScreen.js
 import React, { useState } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { 
+  SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, LayoutAnimation, UIManager, Platform 
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
+// Enable LayoutAnimation on Android
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
 
 const DeliveryDetailsScreen = () => {
   const navigation = useNavigation();
 
-  // Dummy orders data
+  const todayDate = new Date().toDateString();
+
   const orders = [
     {
       id: 'ORD001',
@@ -39,54 +50,71 @@ const DeliveryDetailsScreen = () => {
     },
   ];
 
-  // Track which deliveries have been started
-  const [started, setStarted] = useState([false, false, false, false]);
+  const [activeIndex, setActiveIndex] = useState(null);
 
-  // Toggle start delivery
-  const toggleStartDelivery = (index) => {
-    const updated = [...started];
-    updated[index] = !updated[index];
-    setStarted(updated);
+  const handleStartDelivery = (index) => {
+    // Animate the toggle
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+    if (activeIndex === index) {
+      // If clicking the same active delivery, deactivate it
+      setActiveIndex(null);
+    } else {
+      // Activate only one delivery
+      setActiveIndex(index);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <Icon 
-          name="arrow-back" 
-          size={24} 
-          color="#fff" 
-          onPress={() => navigation.goBack()} 
-        />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Delivery Details</Text>
         <View style={styles.notificationDot} />
       </View>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.headerTitle}>Delivery Details</Text>
 
+      {/* Date row */}
+      <View style={styles.dateContainer}>
+        <MaterialIcons name="calendar-today" size={20} color="#007B7F" />
+        <Text style={styles.dateText}>{todayDate}</Text>
+      </View>
+
+      {/* Orders List */}
+      <ScrollView contentContainerStyle={styles.content}>
         {orders.map((order, index) => (
           <View key={order.id} style={styles.card}>
-            <Text style={styles.label}>Party Name</Text>
-            <Text style={styles.value}>{order.partyName}</Text>
+            <View style={styles.cardRow}>
+              <Text style={styles.label}>Party Name:</Text>
+              <Text style={styles.value}>{order.partyName}</Text>
+            </View>
 
-            <Text style={styles.label}>Delivery Address</Text>
-            <Text style={styles.value}>{order.address}</Text>
+            <View style={styles.cardRow}>
+              <Text style={styles.label}>Delivery Address:</Text>
+              <Text style={styles.value}>{order.address}</Text>
+            </View>
 
-            <Text style={styles.label}>Expected Delivery</Text>
-            <Text style={styles.value}>{order.expectedDelivery}</Text>
+            <View style={styles.cardRow}>
+              <Text style={styles.label}>Expected Delivery:</Text>
+              <Text style={styles.value}>{order.expectedDelivery}</Text>
+            </View>
 
-            <Text style={styles.label}>Material</Text>
-            <Text style={styles.value}>{order.material}</Text>
+            <View style={styles.cardRow}>
+              <Text style={styles.label}>Material:</Text>
+              <Text style={styles.value}>{order.material}</Text>
+            </View>
 
             <TouchableOpacity
               style={[
                 styles.startButton,
-                { backgroundColor: started[index] ? '#4CAF50' : '#ccc' },
+                activeIndex === index ? styles.activeButton : styles.inactiveButton,
               ]}
-              onPress={() => toggleStartDelivery(index)}
+              onPress={() => handleStartDelivery(index)}
             >
               <Text style={styles.startButtonText}>
-                {started[index] ? 'Delivery Started' : 'Start Delivery'}
+                {activeIndex === index ? 'Delivery Started' : 'Start Delivery'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -98,41 +126,76 @@ const DeliveryDetailsScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f0f4f7' },
-  content: { padding: 20 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
     backgroundColor: '#007B7F',
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    padding: 16,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 20,
-    textAlign: 'center',
   },
+  notificationDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'red',
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: '#E8F9F8',
+    margin: 16,
+    borderRadius: 8,
+  },
+  dateText: {
+    fontSize: 16,
+    marginLeft: 8,
+    color: '#007B7F',
+    fontWeight: 'bold',
+  },
+  content: { paddingHorizontal: 16, paddingBottom: 20 },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 4,
+    elevation: 3,
   },
-  label: { fontSize: 14, color: '#888', marginTop: 8 },
-  value: { fontSize: 16, fontWeight: '500', color: '#333', marginTop: 2 },
+  cardRow: {
+    marginBottom: 8,
+  },
+  label: {
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 2,
+  },
+  value: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
+  },
   startButton: {
     marginTop: 12,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
+  },
+  activeButton: {
+    backgroundColor: '#4CAF50',
+  },
+  inactiveButton: {
+    backgroundColor: '#007B7F',
   },
   startButtonText: {
     color: '#fff',

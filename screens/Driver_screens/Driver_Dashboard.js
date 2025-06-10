@@ -1,55 +1,113 @@
 import React from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
 import { useNavigation } from '@react-navigation/native';
-import DeliveryDetailsScreen from './DeliveryDetailsScreen';
+
+// Helper to get color based on days left
+const getTimeColor = daysLeft => {
+  if (daysLeft <= 0) return 'red';
+  if (daysLeft <= 3) return 'orange';
+  if (daysLeft <= 7) return 'green';
+  return '#555';
+};
+
+// Example delivery data
+const deliveries = [
+  {
+    id: 1,
+    partyName: 'Send Chanakpur',
+    description: '3000 nos of bricks',
+    date: '2025-06-09', // 1 day ago -> overdue
+  },
+  {
+    id: 2,
+    partyName: 'Jain Enterprises',
+    description: '5000 nos of steel rods',
+    date: '2025-06-11', // tomorrow -> urgent
+  },
+  {
+    id: 3,
+    partyName: 'Ganesh Traders',
+    description: '29 bags of cement',
+    date: '2025-06-15', // 5 days left -> caution
+  },
+  {
+    id: 4,
+    partyName: 'Sharma Suppliers',
+    description: 'Wooden planks',
+    date: '2025-06-25', // 15 days -> safe
+  },
+];
 
 const Driver_Dashboard = () => {
+  const navigation = useNavigation();
 
-const navigation = useNavigation();
+  const today = new Date();
+
+  const getDaysLeft = dateStr => {
+    const deliveryDate = new Date(dateStr);
+    const diffTime = deliveryDate - today;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}><Icon name="arrow-back" size={24} color="#fff" onPress={()=>navigation.goBack()} />
-        
+      <View style={styles.header}>
+        <Icon
+          name="arrow-back"
+          size={24}
+          color="#fff"
+          onPress={() => navigation.goBack()}
+        />
         <Text style={styles.headerTitle}>DRIVER DASHBOARD</Text>
         <View style={styles.notificationDot} />
       </View>
+
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.sectionTitle}>Today's Deliveries</Text>
-        <View style={styles.deliveryCard}>
-          <MaterialIcons name="local-airport" size={24} color="#007B7F" />
-          <View style={styles.deliveryInfo}>
-            <Text style={styles.deliveryTitle}>Send deliveries</Text>
-            <Text style={styles.deliveryCount}>5</Text>
-          </View>
-        </View>
-        <View style={styles.submittedContainer}>
-          <Text style={styles.submittedLabel}>Submitted on</Text>
-          <TouchableOpacity >
-            <Text style={styles.link}>Link</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.deliveryItem}>
-          <Text style={styles.deliveryName}>Send Chanakpur</Text>
-          <Text style={styles.deliveryDescription}>3000 nos of bricks</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('DeliveryDetailsScreen')}>
-            <Text style={styles.link}>Web link</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.deliveryItem}>
-          <Text style={styles.deliveryName}>Jain Enterprises</Text>
-          <View style={styles.deliveryDetails}>
-            <Text style={styles.deliveryDescription}>Today, 10:00 AM</Text>
-            <Text style={styles.deliveryDescription}>Today, 10:00 AM</Text>
-          </View>
-        </View>
-        <View style={styles.deliveryItem}>
-          <Text style={styles.deliveryName}>Ganesh Traders</Text>
-          <Text style={styles.deliveryDescription}>29 bags of cement</Text>
-          <Text style={styles.deliveryDescription}>April 28</Text>
-        </View>
+        <Text style={styles.sectionTitle}>
+          Remaining Deliveries: {deliveries.length}
+        </Text>
+
+        {deliveries.map(delivery => {
+          const daysLeft = getDaysLeft(delivery.date);
+          const timeColor = getTimeColor(daysLeft);
+          const formattedDate = new Date(delivery.date).toDateString();
+
+          return (
+            <View key={delivery.id} style={styles.deliveryCard}>
+              <MaterialIcons
+                name="local-shipping"
+                size={28}
+                color="#007B7F"
+                style={styles.icon}
+              />
+              <View style={styles.deliveryInfo}>
+                <Text style={styles.partyName}>{delivery.partyName}</Text>
+                <Text style={styles.deliveryDescription}>
+                  {delivery.description}
+                </Text>
+                <Text style={[styles.deliveryDate, { color: timeColor }]}>
+                  {daysLeft <= 0
+                    ? 'Overdue'
+                    : `In ${daysLeft} day${daysLeft > 1 ? 's' : ''} (${formattedDate})`}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('DeliveryDetailsScreen')}
+                >
+                  <Text style={styles.viewDetails}>View Details</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        })}
       </ScrollView>
     </SafeAreaView>
   );
@@ -58,7 +116,7 @@ const navigation = useNavigation();
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F3F4F6',
   },
   header: {
     flexDirection: 'row',
@@ -87,67 +145,47 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: '#1F2937',
   },
   deliveryCard: {
     flexDirection: 'row',
-    backgroundColor: '#E8F9F8',
-    borderRadius: 10,
+    backgroundColor: '#fff',
+    borderRadius: 12,
     padding: 16,
-    alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+  },
+  icon: {
+    marginRight: 16,
   },
   deliveryInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     flex: 1,
-    marginLeft: 12,
   },
-  deliveryTitle: {
+  partyName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#007B7F',
-  },
-  deliveryCount: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#007B7F',
-  },
-  submittedContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    paddingHorizontal: 4,
-  },
-  submittedLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  link: {
-    color: '#007B7F',
-    fontWeight: 'bold',
-  },
-  deliveryItem: {
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#ccc',
-    paddingVertical: 12,
-    marginBottom: 8,
-  },
-  deliveryName: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#111827',
     marginBottom: 4,
   },
   deliveryDescription: {
     fontSize: 14,
     color: '#555',
-    marginBottom: 2,
+    marginBottom: 4,
   },
-  deliveryDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 4,
+  deliveryDate: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  viewDetails: {
+    color: '#007B7F',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
   },
 });
 
 export default Driver_Dashboard;
-
