@@ -1,5 +1,4 @@
 import Icon from 'react-native-vector-icons/Ionicons';
-
 import SignatureScreen from 'react-native-signature-canvas';
 import React, { useRef, useState } from 'react';
 import {
@@ -11,43 +10,29 @@ import {
   StyleSheet,
   Alert,
   StatusBar,
+  Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import MapScreen from './MapScreen';
 
-
-
-export default function DeliveryNoteScreen () {
-
-const navigation = useNavigation();
-
-
+export default function DeliveryNoteScreen() {
+  const navigation = useNavigation();
 
   const [signature, setSignature] = useState(null);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const signatureRef = useRef();
 
-  function handleNavigation(screenName) {
-    navigation.navigate(screenName);
-
-    
-  }
-
-
-
-
-  const handleSignature = (signature) => {
-    setSignature(signature);
+  const handleSignature = (sig) => {
+    setSignature(sig);
     setShowSignaturePad(false);
   };
 
   const handleEmpty = () => {
-    Alert.alert('Warning', 'Please provide a signature');
+    Alert.alert('Warning', 'Please provide a signature.');
   };
 
   const clearSignature = () => {
     setSignature(null);
-    signatureRef.current?.clearSignature();
   };
 
   const style = `.m-signature-pad--footer {display: none; margin: 0px;}`;
@@ -58,59 +43,54 @@ const navigation = useNavigation();
       <ScrollView contentContainerStyle={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton}>
-            <Icon name="add-circle" size={24} color="#fff" />
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerTitle}>NEW DELIVERY NOTE</Text>
-            <Text style={styles.headerSubtitle}>Fill out the details below</Text>
+            <Text style={styles.headerTitle}>New Delivery Note</Text>
+            <Text style={styles.headerSubtitle}>Fill in the details below</Text>
           </View>
         </View>
 
         {/* Form Container */}
         <View style={styles.formContainer}>
-          {/* Party Name */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Party Name</Text>
             <View style={styles.inputContainer}>
               <Icon name="people-outline" size={20} color="#6B7280" style={styles.inputIcon} />
-              <TextInput 
-                placeholder="Enter party name" 
+              <TextInput
+                placeholder="Enter party name"
                 style={styles.input}
                 placeholderTextColor="#9CA3AF"
               />
             </View>
           </View>
 
-          {/* Delivery Address */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Delivery Address</Text>
             <View style={styles.inputContainer}>
               <Icon name="location-outline" size={20} color="#6B7280" style={styles.inputIcon} />
-              <TextInput 
-                placeholder="Enter delivery address" 
+              <TextInput
+                placeholder="Enter delivery address"
                 style={styles.input}
                 placeholderTextColor="#9CA3AF"
                 multiline
-                numberOfLines={2}
               />
             </View>
           </View>
 
-          {/* Material Description */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Material Description</Text>
             <View style={styles.inputContainer}>
               <Icon name="cube-outline" size={20} color="#6B7280" style={styles.inputIcon} />
-              <TextInput 
-                placeholder="Describe the material" 
+              <TextInput
+                placeholder="Describe the material"
                 style={styles.input}
                 placeholderTextColor="#9CA3AF"
               />
             </View>
           </View>
 
-          {/* Quantity */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Quantity</Text>
             <View style={styles.inputContainer}>
@@ -124,7 +104,6 @@ const navigation = useNavigation();
             </View>
           </View>
 
-          {/* Upload Image Button */}
           <TouchableOpacity style={styles.uploadButton}>
             <Icon name="camera-outline" size={24} color="#fff" />
             <Text style={styles.uploadButtonText}>Upload Image</Text>
@@ -133,31 +112,33 @@ const navigation = useNavigation();
           {/* Signature Section */}
           <View style={styles.signatureSection}>
             <Text style={styles.sectionTitle}>Digital Signature</Text>
-            
             {!showSignaturePad ? (
               <View style={styles.signatureContainer}>
                 {signature ? (
                   <View style={styles.signaturePreview}>
-                    <Text style={styles.signatureSuccessText}>✓ Signature Captured</Text>
+                    <Image
+                      source={{ uri: signature }}
+                      style={{ width: '100%', height: 100, resizeMode: 'contain' }}
+                    />
                     <View style={styles.signatureActions}>
-                      <TouchableOpacity 
+                      <TouchableOpacity
                         style={styles.signatureActionButton}
                         onPress={() => setShowSignaturePad(true)}
                       >
                         <Icon name="create-outline" size={18} color="#4A90E2" />
                         <Text style={styles.signatureActionText}>Edit</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity 
+                      <TouchableOpacity
                         style={styles.signatureActionButton}
                         onPress={clearSignature}
                       >
                         <Icon name="trash-outline" size={18} color="#EF4444" />
-                        <Text style={[styles.signatureActionText, {color: '#EF4444'}]}>Clear</Text>
+                        <Text style={[styles.signatureActionText, { color: '#EF4444' }]}>Clear</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
                 ) : (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.signaturePrompt}
                     onPress={() => setShowSignaturePad(true)}
                   >
@@ -177,10 +158,10 @@ const navigation = useNavigation();
                   clearText="Clear"
                   confirmText="Save"
                   webStyle={style}
-                  autoClear={true}
-                  imageType="image/svg+xml"
+                  autoClear
+                  imageType="image/png"
                 />
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.cancelSignatureButton}
                   onPress={() => setShowSignaturePad(false)}
                 >
@@ -191,8 +172,10 @@ const navigation = useNavigation();
           </View>
 
           {/* Capture Location Button */}
-          <TouchableOpacity style={styles.locationButton} 
-            onPress={()=>navigation.navigate(MapScreen)}>
+          <TouchableOpacity
+            style={styles.locationButton}
+            onPress={() => navigation.navigate('MapScreen')}
+          >
             <Icon name="navigate-outline" size={24} color="#fff" />
             <Text style={styles.locationText}>Capture Current Location</Text>
           </TouchableOpacity>
@@ -206,45 +189,40 @@ const navigation = useNavigation();
       </ScrollView>
     </>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F9FAFB',
+    paddingBottom: 20,
   },
   header: {
     backgroundColor: '#4A90E2',
     paddingTop: 60,
-    paddingBottom: 30,
+    paddingBottom: 25,
     paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
   },
   backButton: {
     padding: 8,
     borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   headerTitleContainer: {
     marginLeft: 15,
-    flex: 1,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#fff',
   },
   headerSubtitle: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'rgba(255,255,255,0.8)',
     marginTop: 2,
   },
   formContainer: {
@@ -267,18 +245,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E7EB',
     paddingHorizontal: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
   },
   inputIcon: {
-    marginRight: 12,
+    marginRight: 10,
   },
   input: {
     flex: 1,
-    paddingVertical: 15,
+    paddingVertical: 12,
     fontSize: 16,
     color: '#374151',
   },
@@ -287,14 +260,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 15,
+    paddingVertical: 14,
     borderRadius: 12,
     marginBottom: 25,
-    shadowColor: '#10B981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
   },
   uploadButtonText: {
     color: '#fff',
@@ -303,7 +271,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   signatureSection: {
-    marginBottom: 25,
+    marginBottom: 30,
   },
   sectionTitle: {
     fontSize: 18,
@@ -316,44 +284,37 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    overflow: 'hidden',
   },
   signaturePrompt: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 40,
-    paddingHorizontal: 20,
   },
   signaturePromptText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#374151',
-    marginTop: 10,
+    marginTop: 8,
   },
   signaturePromptSubtext: {
     fontSize: 14,
     color: '#6B7280',
-    marginTop: 4,
+    marginTop: 2,
   },
   signaturePreview: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  signatureSuccessText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#10B981',
-    marginBottom: 15,
+    padding: 15,
   },
   signatureActions: {
     flexDirection: 'row',
+    justifyContent: 'center',
     gap: 20,
+    marginTop: 10,
   },
   signatureActionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     borderRadius: 8,
     backgroundColor: '#F3F4F6',
   },
@@ -373,29 +334,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 6,
   },
   cancelSignatureText: {
     color: '#6B7280',
     fontSize: 14,
-    fontWeight: '500',
   },
   locationButton: {
     backgroundColor: '#F59E0B',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 15,
+    paddingVertical: 14,
     borderRadius: 12,
-    marginBottom: 30,
-    shadowColor: '#F59E0B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    marginBottom: 25,
   },
   locationText: {
     color: '#fff',
@@ -408,13 +363,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
+    paddingVertical: 16,
     borderRadius: 12,
-    shadowColor: '#4A90E2',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 8,
   },
   submitButtonText: {
     color: '#fff',
@@ -425,6 +375,3 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 });
-
-
-
