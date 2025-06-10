@@ -1,21 +1,21 @@
 import React from 'react';
-import { 
-  Text, 
-  View, 
-  Button, 
-  StyleSheet, 
+import {
+  Text,
+  View,
+  Button,
+  StyleSheet,
 
   Dimensions,
-  SafeAreaView 
+  SafeAreaView,
 } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 
 // import { StackNavigationProp } from '@react-navigation/stack';
 
-export default function MapScreen(){
+export default function MapScreen() {
 
-const navigation = useNavigation();
+  const navigation = useNavigation();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.detailsContainer}>
@@ -24,11 +24,11 @@ const navigation = useNavigation();
         <Text style={styles.addressText}>123 Main Street</Text>
         <Text style={styles.addressText}>Apt 4B</Text>
         <Text style={styles.addressText}>New York, NY 10001</Text>
-        
+
         <Text style={styles.detailText}>Estimated Delivery Time:</Text>
         <Text style={styles.timeText}>30-45 minutes</Text>
       </View>
-      <Button 
+      <Button
         title="Go back"
         onPress={() => navigation.goBack()}
         color="#2196F3"
@@ -80,5 +80,5 @@ const styles = StyleSheet.create({
     color: '#2196F3',
     fontWeight: '700',
     marginTop: 4,
-  }
+  },
 });
