@@ -1,18 +1,86 @@
-import React from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
-import { useNavigation } from '@react-navigation/native';
-import DeliveryDetailsScreen from './DeliveryDetailsScreen';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import axios from 'axios';
 
 const Supplier_Dashboard = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const [deliveries, setDeliveries] = useState([]);
 
-const navigation = useNavigation();
+  useEffect(() => {
+    fetchDeliveries();
+  }, []);
+
+  useEffect(() => {
+    if (route.params?.refresh) {
+      fetchDeliveries();
+    }
+  }, [route.params?.refresh]);
+
+  const fetchDeliveries = () => {
+    axios.get('http://192.168.77.238:5001/deliveries')
+      .then(response => {
+        setDeliveries(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching deliveries:', error);
+        Alert.alert('Error', 'Failed to fetch deliveries');
+      });
+  };
+
+  const deleteDelivery = (id) => {
+    Alert.alert(
+      "Delete Delivery",
+      "Are you sure you want to delete this delivery?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            axios.delete(`http://192.168.77.238:5001/deliveries/${id}`)
+              .then(() => {
+                // Remove from local state
+                setDeliveries(deliveries.filter(delivery => delivery._id !== id));
+                Alert.alert("Success", "Delivery deleted successfully");
+              })
+              .catch(error => {
+                console.error('Error deleting delivery:', error);
+                Alert.alert("Error", "Failed to delete delivery");
+              });
+          }
+        }
+      ]
+    );
+  };
+
+  const renderDeliveryItem = ({ item }) => (
+    <View style={styles.card}>
+      <View style={styles.deliveryContent}>
+        <Text style={styles.partyName}>{item.pname}</Text>
+        <Text style={styles.details}>Material: {item.material}</Text>
+        <Text style={styles.details}>Quantity: {item.quantity}</Text>
+        <Text style={styles.details}>Expected: {item.expectedDeliveryDate}</Text>
+      </View>
+      <TouchableOpacity 
+        style={styles.deleteIconButton}
+        onPress={() => deleteDelivery(item._id)}
+      >
+        <Icon name="trash-outline" size={24} color="#FF4444" />
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}><Icon name="arrow-back" size={24} color="#fff" onPress={()=>navigation.goBack()} />
-        
+      <View style={styles.header}>
+        <Icon name="arrow-back" size={24} color="#fff" onPress={()=>navigation.goBack()} />
         <Text style={styles.headerTitle}>SUPPLIER DASHBOARD</Text>
         <View style={styles.notificationDot} />
       </View>
@@ -31,25 +99,12 @@ const navigation = useNavigation();
             <Text style={styles.link}>Link</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.deliveryItem}>
-          <Text style={styles.deliveryName}>Send Chanakpur</Text>
-          <Text style={styles.deliveryDescription}>3000 nos of bricks</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('DeliveryDetailsScreen')}>
-            <Text style={styles.link}>Web link</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.deliveryItem}>
-          <Text style={styles.deliveryName}>Jain Enterprises</Text>
-          <View style={styles.deliveryDetails}>
-            <Text style={styles.deliveryDescription}>Today, 10:00 AM</Text>
-            <Text style={styles.deliveryDescription}>Today, 10:00 AM</Text>
-          </View>
-        </View>
-        <View style={styles.deliveryItem}>
-          <Text style={styles.deliveryName}>Ganesh Traders</Text>
-          <Text style={styles.deliveryDescription}>29 bags of cement</Text>
-          <Text style={styles.deliveryDescription}>April 28</Text>
-        </View>
+        <FlatList
+          data={deliveries}
+          renderItem={renderDeliveryItem}
+          keyExtractor={item => item._id}
+          contentContainerStyle={styles.listContainer}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -126,26 +181,27 @@ const styles = StyleSheet.create({
     color: '#007B7F',
     fontWeight: 'bold',
   },
-  deliveryItem: {
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#ccc',
-    paddingVertical: 12,
-    marginBottom: 8,
+  listContainer: {
+    padding: 16,
   },
-  deliveryName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  deliveryDescription: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 2,
-  },
-  deliveryDetails: {
+  card: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    elevation: 2,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 4,
+    alignItems: 'center',
+  },
+  deliveryContent: {
+    flex: 1,
+  },
+  deleteIconButton: {
+    backgroundColor: '#FFE5E5',
+    padding: 8,
+    borderRadius: 8,
+    marginLeft: 12,
   },
 });
 

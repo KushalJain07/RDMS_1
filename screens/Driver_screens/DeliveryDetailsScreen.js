@@ -1,96 +1,75 @@
 // DeliveryDetailsScreen.js
 import React, { useState } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
 
 const DeliveryDetailsScreen = () => {
+  const route = useRoute();
   const navigation = useNavigation();
+  const delivery = route.params?.delivery;
 
-  // Dummy orders data
-  const orders = [
-    {
-      id: 'ORD001',
-      partyName: 'Jain Enterprises',
-      address: '123 Industrial Area, City Center, New Delhi, 110001',
-      expectedDelivery: 'June 15, 2025, 10:00 AM',
-      material: '5000 nos of Bricks',
-    },
-    {
-      id: 'ORD002',
-      partyName: 'Ganesh Traders',
-      address: '456 Market Street, Downtown, Mumbai, 400001',
-      expectedDelivery: 'June 16, 2025, 12:00 PM',
-      material: '50 Bags of Cement',
-    },
-    {
-      id: 'ORD003',
-      partyName: 'Sharma Suppliers',
-      address: '789 Business Park, Noida, 201301',
-      expectedDelivery: 'June 17, 2025, 2:00 PM',
-      material: '200 Steel Rods',
-    },
-    {
-      id: 'ORD004',
-      partyName: 'Kumar Industries',
-      address: '321 Warehouse Lane, Pune, 411001',
-      expectedDelivery: 'June 18, 2025, 9:30 AM',
-      material: '100 Bags of Sand',
-    },
-  ];
-
-  // Track which deliveries have been started
-  const [started, setStarted] = useState([false, false, false, false]);
-
-  // Toggle start delivery
-  const toggleStartDelivery = (index) => {
-    const updated = [...started];
-    updated[index] = !updated[index];
-    setStarted(updated);
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Delivery",
+      "Are you sure you want to delete this delivery?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            axios.delete(`http://10.0.2.2:5001/deliveries/${delivery._id}`)
+              .then(() => {
+                Alert.alert("Success", "Delivery deleted successfully");
+                navigation.navigate('Supplier_Dashboard', { refresh: true });
+              })
+              .catch(error => {
+                console.error('Error deleting delivery:', error);
+                Alert.alert("Error", "Failed to delete delivery");
+              });
+          }
+        }
+      ]
+    );
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Icon 
-          name="arrow-back" 
-          size={24} 
-          color="#fff" 
-          onPress={() => navigation.goBack()} 
-        />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Delivery Details</Text>
-        <View style={styles.notificationDot} />
+        <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
+          <Icon name="trash-outline" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.headerTitle}>Delivery Details</Text>
+      
+      <ScrollView style={styles.content}>
+        <View style={styles.card}>
+          <Text style={styles.label}>Party Name</Text>
+          <Text style={styles.value}>{delivery.pname}</Text>
 
-        {orders.map((order, index) => (
-          <View key={order.id} style={styles.card}>
-            <Text style={styles.label}>Party Name</Text>
-            <Text style={styles.value}>{order.partyName}</Text>
+          <Text style={styles.label}>Address</Text>
+          <Text style={styles.value}>{delivery.address}</Text>
 
-            <Text style={styles.label}>Delivery Address</Text>
-            <Text style={styles.value}>{order.address}</Text>
+          <Text style={styles.label}>Material</Text>
+          <Text style={styles.value}>{delivery.material}</Text>
 
-            <Text style={styles.label}>Expected Delivery</Text>
-            <Text style={styles.value}>{order.expectedDelivery}</Text>
+          <Text style={styles.label}>Quantity</Text>
+          <Text style={styles.value}>{delivery.quantity}</Text>
 
-            <Text style={styles.label}>Material</Text>
-            <Text style={styles.value}>{order.material}</Text>
+          <Text style={styles.label}>Expected Delivery</Text>
+          <Text style={styles.value}>{delivery.expectedDeliveryDate}</Text>
 
-            <TouchableOpacity
-              style={[
-                styles.startButton,
-                { backgroundColor: started[index] ? '#4CAF50' : '#ccc' },
-              ]}
-              onPress={() => toggleStartDelivery(index)}
-            >
-              <Text style={styles.startButtonText}>
-                {started[index] ? 'Delivery Started' : 'Start Delivery'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+          <Text style={styles.label}>Contact Number</Text>
+          <Text style={styles.value}>{delivery.contactNumber}</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -112,8 +91,9 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 20,
+    flex: 1,
     textAlign: 'center',
+    marginLeft: -24, // To center the title properly
   },
   card: {
     backgroundColor: '#ffffff',
@@ -128,15 +108,8 @@ const styles = StyleSheet.create({
   },
   label: { fontSize: 14, color: '#888', marginTop: 8 },
   value: { fontSize: 16, fontWeight: '500', color: '#333', marginTop: 2 },
-  startButton: {
-    marginTop: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  startButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  deleteButton: {
+    padding: 8,
   },
 });
 

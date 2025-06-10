@@ -13,38 +13,62 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
+axios.defaults.timeout = 10000; // 10 seconds timeout
+axios.defaults.headers.common['Content-Type'] = 'application/json';
+
+const API_URL = 'http://10.0.2.2:5001'; // Remove /api from here
 
 const CreateDelivery = () => {
-  const navigation = useNavigation();
-  const [deliveryDetails, setDeliveryDetails] = useState({
-    partyName: '',
-    address: '',
-    material: '',
-    quantity: '',
-    expectedDeliveryDate: '',
-    contactNumber: ''
-  });
+    const navigation = useNavigation();
+    const [isLoading, setIsLoading] = useState(false);
+    const [deliveryDetails, setDeliveryDetails] = useState({
+        partyName: '',
+        address: '',
+        material: '',
+        quantity: '',
+        expectedDeliveryDate: '',
+        contactNumber: ''
+      });
+  
 
   function handleSubmit(){
     const data = {
         pname: deliveryDetails.partyName,
         address: deliveryDetails.address,
         material: deliveryDetails.material,
-        // quantity: deliveryDetails.quantity,
-        // expectedDeliveryDate: deliveryDetails.expectedDeliveryDate,
-        // contactNumber: deliveryDetails.contactNumber
-    }
+        quantity: deliveryDetails.quantity,
+        expectedDeliveryDate: deliveryDetails.expectedDeliveryDate,
+        contactNumber: deliveryDetails.contactNumber
+    };
 
-    
-    axios.post('http://192.168.77.238:5001/register', data)  // Added data parameter
+    setIsLoading(true);
+
+    axios.post(`${API_URL}/register`, data) // Change endpoint to /register
         .then((response) => {
             console.log('Delivery created successfully:', response.data);
-            Alert.alert('Success', 'Delivery created successfully!');
-            navigation.goBack();
+            Alert.alert(
+                'Success', 
+                'Delivery created successfully!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => navigation.navigate('Supplier_Dashboard', { 
+                            newDelivery: response.data,
+                            refresh: true 
+                        })
+                    }
+                ]
+            );
         })
         .catch((error) => {
-            console.error('Error creating delivery:', error);
-            Alert.alert('Error', 'Failed to create delivery');
+            console.error('Error creating delivery:', error.response?.data || error.message);
+            Alert.alert(
+                'Error', 
+                `Failed to create delivery: ${error.message}`,
+            );
+        })
+        .finally(() => {
+            setIsLoading(false);
         });
     }
 
@@ -111,8 +135,8 @@ const CreateDelivery = () => {
             keyboardType="phone-pad"
           />
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.submitButtonText}>Create Delivery</Text>
+          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={isLoading}>
+            <Text style={styles.submitButtonText}>{isLoading ? 'Creating...' : 'Create Delivery'}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -179,5 +203,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
 export default CreateDelivery;
