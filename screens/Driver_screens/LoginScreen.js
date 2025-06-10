@@ -17,10 +17,10 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    if (selectedRole === 'Create Delivery') {
-      navigation.navigate('CreateDelivery');
-    } else if (selectedRole === 'Supplier') {
+    if (selectedRole === 'Driver') {
       navigation.navigate('Supplier_Dashboard');
+    } else if (selectedRole === 'Supplier') {
+      navigation.navigate('DeliveryNoteScreen');
     }
   };
 
@@ -37,7 +37,7 @@ export default function LoginScreen() {
         <Text style={styles.loginHeading}>LOG IN</Text>
 
         <View style={styles.radioGroup}>
-          {['Create Delivery', 'Supplier'].map(role => (
+          {['Driver', 'Supplier'].map(role => (
             <TouchableOpacity
               key={role}
               style={styles.radioButton}

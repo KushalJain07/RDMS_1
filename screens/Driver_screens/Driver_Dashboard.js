@@ -13,7 +13,7 @@ const navigation = useNavigation();
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}><Icon name="arrow-back" size={24} color="#fff" onPress={()=>navigation.goBack()} />
         
-        <Text style={styles.headerTitle}>SUPPLIER DASHBOARD</Text>
+        <Text style={styles.headerTitle}>DRIVER DASHBOARD</Text>
         <View style={styles.notificationDot} />
       </View>
       <ScrollView contentContainerStyle={styles.content}>
