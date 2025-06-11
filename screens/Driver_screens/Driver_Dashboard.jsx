@@ -61,12 +61,16 @@ const Driver_Dashboard = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Icon
-          name="arrow-back"
-          size={24}
-          color="#fff"
-          onPress={() => navigation.goBack()}
-        />
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('LoginScreen')}
+          style={styles.backButton}
+        >
+          <Icon
+            name="arrow-back"
+            size={24}
+            color="#fff"
+          />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>DRIVER DASHBOARD</Text>
         <View style={styles.notificationDot} />
       </View>
@@ -185,6 +189,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     textDecorationLine: 'underline',
+  },
+  backButton: {
+    padding: 8,
+    marginRight: 8,
   },
 });
 

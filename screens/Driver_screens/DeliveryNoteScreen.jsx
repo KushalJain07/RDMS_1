@@ -13,7 +13,7 @@ import {
   Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import MapScreen from './MapScreen';
+import axios from 'axios';
 
 export default function DeliveryNoteScreen() {
   const navigation = useNavigation();
@@ -37,13 +37,74 @@ export default function DeliveryNoteScreen() {
 
   const style = `.m-signature-pad--footer {display: none; margin: 0px;}`;
 
+  const [deliveryDetails, setDeliveryDetails] = useState({
+    partyName: '',
+    address: '',
+    material: '',
+    quantity: '',
+    expectedDeliveryDate: '',
+    contactNumber: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Add API configuration
+  const API_URL = 'http://10.0.2.2:5001';
+
+
+const handleSubmit = () => {
+  if (!deliveryDetails.partyName || !deliveryDetails.address || !deliveryDetails.material) {
+    Alert.alert('Error', 'Please fill in all required fields');
+    return;
+  }
+
+  setIsLoading(true);
+
+  const data = {
+    pname: deliveryDetails.partyName,
+    address: deliveryDetails.address,
+    material: deliveryDetails.material,
+    quantity: deliveryDetails.quantity,
+    expectedDeliveryDate: deliveryDetails.expectedDeliveryDate,
+    contactNumber: deliveryDetails.contactNumber
+  };
+
+  axios.post(`${API_URL}/register`, data)
+    .then((response) => {
+      console.log('Delivery created successfully:', response.data);
+      Alert.alert(
+        'Success', 
+        'Delivery created successfully!',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('SupplierDashboard', { 
+              newDelivery: response.data,
+              refresh: true 
+            })
+          }
+        ]
+      );
+    })
+    .catch((error) => {
+      console.error('Error creating delivery:', error.response?.data || error.message);
+      Alert.alert(
+        'Error', 
+        `Failed to create delivery: ${error.message}`,
+      );
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+};
+
+
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#4A90E2" />
       <ScrollView contentContainerStyle={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('LoginScreen')}>
             <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
@@ -62,6 +123,8 @@ export default function DeliveryNoteScreen() {
                 placeholder="Enter party name"
                 style={styles.input}
                 placeholderTextColor="#9CA3AF"
+                value={deliveryDetails.partyName}
+                onChangeText={(text) => setDeliveryDetails({...deliveryDetails, partyName: text})}
               />
             </View>
           </View>
@@ -75,6 +138,8 @@ export default function DeliveryNoteScreen() {
                 style={styles.input}
                 placeholderTextColor="#9CA3AF"
                 multiline
+                value={deliveryDetails.address}
+                onChangeText={(text) => setDeliveryDetails({...deliveryDetails, address: text})}
               />
             </View>
           </View>
@@ -87,6 +152,8 @@ export default function DeliveryNoteScreen() {
                 placeholder="Describe the material"
                 style={styles.input}
                 placeholderTextColor="#9CA3AF"
+                value={deliveryDetails.material}
+                onChangeText={(text) => setDeliveryDetails({...deliveryDetails, material: text})}
               />
             </View>
           </View>
@@ -100,6 +167,8 @@ export default function DeliveryNoteScreen() {
                 style={styles.input}
                 keyboardType="numeric"
                 placeholderTextColor="#9CA3AF"
+                value={deliveryDetails.quantity}
+                onChangeText={(text) => setDeliveryDetails({...deliveryDetails, quantity: text})}
               />
             </View>
           </View>
@@ -181,8 +250,14 @@ export default function DeliveryNoteScreen() {
           </TouchableOpacity>
 
           {/* Submit Button */}
-          <TouchableOpacity style={styles.submitButton} onPress={()=>navigation.navigate('UpdateScreen')}>
-            <Text style={styles.submitButtonText}>Create Delivery Note</Text>
+          <TouchableOpacity 
+            style={[styles.submitButton, isLoading && { opacity: 0.7 }]} 
+            onPress={handleSubmit}
+            disabled={isLoading}
+          >
+            <Text style={styles.submitButtonText}>
+              {isLoading ? 'Creating...' : 'Create Delivery Note'}
+            </Text>
             <Icon name="checkmark-circle-outline" size={24} color="#fff" style={styles.submitIcon} />
           </TouchableOpacity>
         </View>
