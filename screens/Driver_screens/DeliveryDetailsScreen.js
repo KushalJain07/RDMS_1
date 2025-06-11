@@ -8,10 +8,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 // Enable LayoutAnimation on Android
-if (Platform.OS === 'android') {
-  if (UIManager.setLayoutAnimationEnabledExperimental) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental)
+{
     UIManager.setLayoutAnimationEnabledExperimental(true);
-  }
 }
 
 const DeliveryDetailsScreen = () => {

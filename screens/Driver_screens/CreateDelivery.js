@@ -112,7 +112,7 @@ const CreateDelivery = () => {
             keyboardType="phone-pad"
           />
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <TouchableOpacity style={styles.submitButton} onPress={navigation.navigate('Update')}>
             <Text style={styles.submitButtonText}>Create Delivery</Text>
           </TouchableOpacity>
         </View>

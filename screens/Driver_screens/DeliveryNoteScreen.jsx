@@ -181,7 +181,7 @@ export default function DeliveryNoteScreen() {
           </TouchableOpacity>
 
           {/* Submit Button */}
-          <TouchableOpacity style={styles.submitButton}>
+          <TouchableOpacity style={styles.submitButton} onPress={()=>navigation.navigate('UpdateScreen')}>
             <Text style={styles.submitButtonText}>Create Delivery Note</Text>
             <Icon name="checkmark-circle-outline" size={24} color="#fff" style={styles.submitIcon} />
           </TouchableOpacity>

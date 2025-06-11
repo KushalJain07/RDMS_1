@@ -6,6 +6,7 @@ import Driver_Dashboard from './screens/Driver_screens/Driver_Dashboard';
 import DeliveryDetailsScreen from './screens/Driver_screens/DeliveryDetailsScreen';
 import LoginScreen from './screens/Driver_screens/LoginScreen';
 import CreateDelivery from './screens/Driver_screens/CreateDelivery';
+import UpdateScreen from './screens/Driver_screens/UpdateScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -25,6 +26,7 @@ const App = () => {
           <Stack.Screen name="DeliveryDetailsScreen" component={DeliveryDetailsScreen} />
           <Stack.Screen name="MapScreen" component={MapScreen} />
           <Stack.Screen name="DeliveryNoteScreen" component={DeliveryNoteScreen} />
+          <Stack.Screen name="UpdateScreen" component={UpdateScreen} />
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>
