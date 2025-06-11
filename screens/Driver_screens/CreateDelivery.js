@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   View,
@@ -135,8 +136,8 @@ const CreateDelivery = () => {
             keyboardType="phone-pad"
           />
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={isLoading}>
-            <Text style={styles.submitButtonText}>{isLoading ? 'Creating...' : 'Create Delivery'}</Text>
+          <TouchableOpacity style={styles.submitButton} onPress={navigation.navigate('Update')}>
+            <Text style={styles.submitButtonText}>Create Delivery</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
