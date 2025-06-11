@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { 
   SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, LayoutAnimation, UIManager, Platform 
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -14,8 +14,9 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 const DeliveryDetailsScreen = () => {
-  const route = useRoute();
   const navigation = useNavigation();
+  const route = useRoute();
+  const delivery = route.params?.deliveryData;
 
   const todayDate = new Date().toDateString();
 
@@ -65,143 +66,105 @@ const DeliveryDetailsScreen = () => {
     }
   };
 
+  if (!delivery) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.header}>
+          <TouchableOpacity 
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Icon name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Error</Text>
+        </View>
+        <View style={styles.content}>
+          <Text>No delivery data available</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity 
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Delivery Details</Text>
-        <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-          <Icon name="trash-outline" size={24} color="#fff" />
-        </TouchableOpacity>
       </View>
-
-      {/* Date row */}
-      <View style={styles.dateContainer}>
-        <MaterialIcons name="calendar-today" size={20} color="#007B7F" />
-        <Text style={styles.dateText}>{todayDate}</Text>
-      </View>
-
-      {/* Orders List */}
-      <ScrollView contentContainerStyle={styles.content}>
-        {orders.map((order, index) => (
-          <View key={order.id} style={styles.card}>
-            <View style={styles.cardRow}>
-              <Text style={styles.label}>Party Name:</Text>
-              <Text style={styles.value}>{order.partyName}</Text>
-            </View>
-
-            <View style={styles.cardRow}>
-              <Text style={styles.label}>Delivery Address:</Text>
-              <Text style={styles.value}>{order.address}</Text>
-            </View>
-
-            <View style={styles.cardRow}>
-              <Text style={styles.label}>Expected Delivery:</Text>
-              <Text style={styles.value}>{order.expectedDelivery}</Text>
-            </View>
-
-            <View style={styles.cardRow}>
-              <Text style={styles.label}>Material:</Text>
-              <Text style={styles.value}>{order.material}</Text>
-            </View>
-
-            <TouchableOpacity
-              style={[
-                styles.startButton,
-                activeIndex === index ? styles.activeButton : styles.inactiveButton,
-              ]}
-              onPress={() => handleStartDelivery(index)}
-            >
-              <Text style={styles.startButtonText}>
-                {activeIndex === index ? 'Delivery Started' : 'Start Delivery'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+      <ScrollView style={styles.content}>
+        <View style={styles.detailCard}>
+          <Text style={styles.label}>Party Name</Text>
+          <Text style={styles.value}>{delivery.pname}</Text>
+          
+          <Text style={styles.label}>Address</Text>
+          <Text style={styles.value}>{delivery.address}</Text>
+          
+          <Text style={styles.label}>Material</Text>
+          <Text style={styles.value}>{delivery.material}</Text>
+          
+          <Text style={styles.label}>Quantity</Text>
+          <Text style={styles.value}>{delivery.quantity}</Text>
+          
+          <Text style={styles.label}>Expected Delivery</Text>
+          <Text style={styles.value}>
+            {new Date(delivery.expectedDeliveryDate).toLocaleDateString()}
+          </Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0f4f7' },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+  },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#007B7F',
-    padding: 16,
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
     color: '#fff',
-  },
-  notificationDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: 'red',
-  },
-  dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#E8F9F8',
-    margin: 16,
-    borderRadius: 8,
-  },
-  dateText: {
-    fontSize: 16,
-    marginLeft: 8,
-    color: '#007B7F',
     fontWeight: 'bold',
+    fontSize: 18,
+    flex: 1,
+    textAlign: 'center',
   },
-  content: { paddingHorizontal: 16, paddingBottom: 20 },
-  card: {
+  content: {
+    padding: 20,
+  },
+  backButton: {
+    padding: 8,
+    marginRight: 8,
+  },
+  detailCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    elevation: 3,
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  cardRow: {
-    marginBottom: 8,
+    shadowRadius: 6,
   },
   label: {
     fontSize: 14,
-    color: '#777',
-    marginBottom: 2,
+    color: '#6B7280',
+    marginTop: 12,
+    marginBottom: 4,
   },
   value: {
     fontSize: 16,
-    color: '#333',
+    color: '#111827',
     fontWeight: '500',
-  },
-  startButton: {
-    marginTop: 12,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  activeButton: {
-    backgroundColor: '#4CAF50',
-  },
-  inactiveButton: {
-    backgroundColor: '#007B7F',
-  },
-  startButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
 });
 
