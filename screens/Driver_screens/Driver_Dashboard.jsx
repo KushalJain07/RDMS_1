@@ -32,12 +32,25 @@ const Driver_Dashboard = ({ route }) => {  // Add route as a prop
     }
   }, [route?.params?.refresh]);
 
+  const getRandomDate = () => {
+    const today = new Date();
+    const randomDays = Math.floor(Math.random() * 20) + 1; // Random number between 1-20
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + randomDays);
+    return futureDate.toISOString();
+  };
+
   const fetchDeliveries = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/deliveries`); // Changed from /deliveries to /register
-      console.log('Fetched deliveries:', response.data);
-      setDeliveries(response.data);
+      const response = await axios.get(`${API_URL}/deliveries`);
+      // Add random dates to each delivery
+      const deliveriesWithDates = response.data.map(delivery => ({
+        ...delivery,
+        expectedDeliveryDate: delivery.expectedDeliveryDate || getRandomDate()
+      }));
+      console.log('Fetched deliveries:', deliveriesWithDates);
+      setDeliveries(deliveriesWithDates);
     } catch (error) {
       console.error('Error fetching deliveries:', error);
       Alert.alert('Error', 'Failed to fetch deliveries');
@@ -81,44 +94,46 @@ const Driver_Dashboard = ({ route }) => {  // Add route as a prop
         {isLoading ? (
           <Text style={styles.loadingText}>Loading deliveries...</Text>
         ) : (
-          deliveries.map(delivery => {
-            const daysLeft = getDaysLeft(delivery.expectedDeliveryDate);
-            const timeColor = getTimeColor(daysLeft);
-            const formattedDate = new Date(delivery.expectedDeliveryDate).toDateString();
+          deliveries
+            .sort((a, b) => new Date(a.expectedDeliveryDate) - new Date(b.expectedDeliveryDate))
+            .map(delivery => {
+              const daysLeft = getDaysLeft(delivery.expectedDeliveryDate);
+              const timeColor = getTimeColor(daysLeft);
+              const formattedDate = new Date(delivery.expectedDeliveryDate).toDateString();
 
-            return (
-              <View key={delivery._id} style={styles.deliveryCard}>
-                <MaterialIcons
-                  name="local-shipping"
-                  size={28}
-                  color="#007B7F"
-                  style={styles.icon}
-                />
-                <View style={styles.deliveryInfo}>
-                  <Text style={styles.partyName}>{delivery.pname}</Text>
-                  <Text style={styles.deliveryDescription}>
-                    {delivery.material} - {delivery.quantity}
-                  </Text>
-                  <Text style={[styles.deliveryDate, { color: timeColor }]}>
-                    {daysLeft <= 0
-                      ? 'Overdue'
-                      : `In ${daysLeft} day${daysLeft > 1 ? 's' : ''} (${formattedDate})`}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      console.log('Navigating with delivery:', delivery);
-                      navigation.navigate('DeliveryDetailsScreen', {
-                        deliveryData: delivery
-                      });
-                    }}
-                    style={styles.detailsButton}
-                  >
-                    <Text style={styles.viewDetails}>View Details</Text>
-                  </TouchableOpacity>
+              return (
+                <View key={delivery._id} style={styles.deliveryCard}>
+                  <MaterialIcons
+                    name="local-shipping"
+                    size={28}
+                    color="#007B7F"
+                    style={styles.icon}
+                  />
+                  <View style={styles.deliveryInfo}>
+                    <Text style={styles.partyName}>{delivery.pname}</Text>
+                    <Text style={styles.deliveryDescription}>
+                      {delivery.material} - {delivery.quantity}
+                    </Text>
+                    <Text style={[styles.deliveryDate, { color: timeColor }]}>
+                      {daysLeft <= 0
+                        ? 'Overdue'
+                        : `In ${daysLeft} day${daysLeft > 1 ? 's' : ''} (${formattedDate})`}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        console.log('Navigating with delivery:', delivery);
+                        navigation.navigate('DeliveryDetailsScreen', {
+                          deliveryData: delivery
+                        });
+                      }}
+                      style={styles.detailsButton}
+                    >
+                      <Text style={styles.viewDetails}>View Details</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            );
-          })
+              );
+            })
         )}
       </ScrollView>
     </SafeAreaView>
