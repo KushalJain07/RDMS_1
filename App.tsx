@@ -4,11 +4,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // Screen imports
-import LoginScreen from './screens/Driver_screens/LoginScreen.js';
-import DriverDashboard from './screens/Driver_screens/Driver_Dashboard.jsx';
-import DeliveryNoteScreen from './screens/Driver_screens/DeliveryNoteScreen.jsx';
-import SupplierDashboard from './screens/Driver_screens/Supplier_Dashboard.jsx';
-import DeliveryDetailsScreen from './screens/Driver_screens/DeliveryDetailsScreen.js';
+import LoginScreen from './screens/Driver_screens/LoginScreen.tsx';
+import DriverDashboard from './screens/Driver_screens/Driver_Dashboard.tsx';
+import DeliveryNoteScreen from './screens/Driver_screens/DeliveryNoteScreen.tsx';
+import SupplierDashboard from './screens/Driver_screens/Supplier_Dashboard.tsx';
+import DeliveryDetailsScreen from './screens/Driver_screens/DeliveryDetailsScreen.tsx';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,8 +16,8 @@ const App = () => {
   return (
     <NavigationContainer>
       <SafeAreaView style={styles.container}>
-        <Stack.Navigator 
-          initialRouteName="LoginScreen" 
+        <Stack.Navigator
+          initialRouteName="LoginScreen"
           screenOptions={{headerShown: false}}
         >
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  }
-})
+  },
+});
 
 export default App;

@@ -13,6 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { supplierDeliveries } from '../../src/mockData';
 
 type Delivery = {
   _id: string;
@@ -44,27 +45,7 @@ const SupplierDashboard: React.FC = () => {
   }, []);
 
   const loadMockData = () => {
-    const mock: Delivery[] = [
-      {
-        _id: 'del_001',
-        partyName: 'Agarwal Cement Traders',
-        address: '132 Industrial Road, Nagpur',
-        material: '40 bags Cement',
-        quantity: '40',
-        expectedDate: '2025-06-17',
-        expectedTime: '11:30 AM',
-      },
-      {
-        _id: 'del_002',
-        partyName: 'Universal Bricks',
-        address: 'Plot 45, Wadi Layout',
-        material: '3000 Bricks',
-        quantity: '3000',
-        expectedDate: '2025-06-18',
-        expectedTime: '2:00 PM',
-      },
-    ];
-    setDeliveries(mock);
+    setDeliveries(supplierDeliveries);
   };
 
   const deleteDelivery = (id: string) => {

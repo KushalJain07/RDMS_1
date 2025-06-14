@@ -10,6 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation, useRoute, NavigationProp, RouteProp } from '@react-navigation/native';
+import { driverDeliveries } from '../../src/mockData';
 
 type Delivery = {
   _id: string;
@@ -33,18 +34,7 @@ const Driver_Dashboard: React.FC = () => {
 
 
   useEffect(() => {
-    // Simulated local data for frontend only
-    const mockDeliveries: Delivery[] = [
-      {
-        _id: '1',
-        pname: 'Singh Distributors',
-        material: 'Bricks',
-        quantity: '4000',
-        expectedDeliveryDate: getRandomDate(),
-        address: 'A-12, Old Town Rd, Indore',
-      },
-    ];
-    setDeliveries(mockDeliveries);
+    setDeliveries(driverDeliveries);
   }, []);
 
   useEffect(() => {
@@ -53,11 +43,11 @@ const Driver_Dashboard: React.FC = () => {
     }
   }, [route?.params?.refresh]);
 
-  const getRandomDate = () => {
-    const future = new Date();
-    future.setDate(future.getDate() + Math.floor(Math.random() * 10) + 1);
-    return future.toISOString();
-  };
+  // const getRandomDate = () => {
+  //   const future = new Date();
+  //   future.setDate(future.getDate() + Math.floor(Math.random() * 10) + 1);
+  //   return future.toISOString();
+  // };
 
   const getDaysLeft = (dateStr: string): number => {
     const deliveryDate = new Date(dateStr);
