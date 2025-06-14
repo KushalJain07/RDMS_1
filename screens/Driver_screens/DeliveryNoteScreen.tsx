@@ -1,5 +1,3 @@
-import Icon from 'react-native-vector-icons/Ionicons';
-import SignatureScreen from 'react-native-signature-canvas';
 import React, { useRef, useState } from 'react';
 import {
   View,
@@ -7,22 +5,43 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
   Alert,
   StatusBar,
   Image,
+  StyleSheet,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import Icon from 'react-native-vector-icons/Ionicons';
+import SignatureScreen from 'react-native-signature-canvas';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+
+type DeliveryDetails = {
+  partyName: string;
+  address: string;
+  material: string;
+  quantity: string;
+  expectedDeliveryDate: string;
+  contactNumber: string;
+};
 
 export default function DeliveryNoteScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
+  const [signature, setSignature] = useState<string | null>(null);
+  const [showSignaturePad, setShowSignaturePad] = useState<boolean>(false);
+  const signatureRef = useRef<any>(null);
 
-  const [signature, setSignature] = useState(null);
-  const [showSignaturePad, setShowSignaturePad] = useState(false);
-  const signatureRef = useRef();
+  const [deliveryDetails, setDeliveryDetails] = useState<DeliveryDetails>({
+    partyName: '',
+    address: '',
+    material: '',
+    quantity: '',
+    expectedDeliveryDate: '',
+    contactNumber: '',
+  });
 
-  const handleSignature = (sig) => {
+  const [isLoading, _setIsLoading] = useState<boolean>(false);
+  const signatureWebStyle = '.m-signature-pad--footer {display: none; margin: 0px;}';
+
+  const handleSignature = (sig: string) => {
     setSignature(sig);
     setShowSignaturePad(false);
   };
@@ -35,76 +54,24 @@ export default function DeliveryNoteScreen() {
     setSignature(null);
   };
 
-  const style = `.m-signature-pad--footer {display: none; margin: 0px;}`;
+  const handleSubmit = () => {
+    if (!deliveryDetails.partyName || !deliveryDetails.address || !deliveryDetails.material) {
+      Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
 
-  const [deliveryDetails, setDeliveryDetails] = useState({
-    partyName: '',
-    address: '',
-    material: '',
-    quantity: '',
-    expectedDeliveryDate: '',
-    contactNumber: ''
-  });
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Add API configuration
-  const API_URL = 'http://10.0.2.2:5001';
-
-
-const handleSubmit = () => {
-  if (!deliveryDetails.partyName || !deliveryDetails.address || !deliveryDetails.material) {
-    Alert.alert('Error', 'Please fill in all required fields');
-    return;
-  }
-
-  setIsLoading(true);
-
-  const data = {
-    pname: deliveryDetails.partyName,
-    address: deliveryDetails.address,
-    material: deliveryDetails.material,
-    quantity: deliveryDetails.quantity,
-    expectedDeliveryDate: deliveryDetails.expectedDeliveryDate,
-    contactNumber: deliveryDetails.contactNumber
+    Alert.alert('Saved Locally', 'This is a frontend-only mockup for now.');
   };
-
-  axios.post(`${API_URL}/register`, data)
-    .then((response) => {
-      console.log('Delivery created successfully:', response.data);
-      Alert.alert(
-        'Success', 
-        'Delivery created successfully!',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('SupplierDashboard', { 
-              newDelivery: response.data,
-              refresh: true 
-            })
-          }
-        ]
-      );
-    })
-    .catch((error) => {
-      console.error('Error creating delivery:', error.response?.data || error.message);
-      Alert.alert(
-        'Error', 
-        `Failed to create delivery: ${error.message}`,
-      );
-    })
-    .finally(() => {
-      setIsLoading(false);
-    });
-};
-
 
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#4A90E2" />
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('LoginScreen')}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.navigate('LoginScreen')}
+          >
             <Icon name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
@@ -113,8 +80,8 @@ const handleSubmit = () => {
           </View>
         </View>
 
-        {/* Form Container */}
         <View style={styles.formContainer}>
+          {/* Party Name Input */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Party Name</Text>
             <View style={styles.inputContainer}>
@@ -124,11 +91,14 @@ const handleSubmit = () => {
                 style={styles.input}
                 placeholderTextColor="#9CA3AF"
                 value={deliveryDetails.partyName}
-                onChangeText={(text) => setDeliveryDetails({...deliveryDetails, partyName: text})}
+                onChangeText={(text) =>
+                  setDeliveryDetails({ ...deliveryDetails, partyName: text })
+                }
               />
             </View>
           </View>
 
+          {/* Address */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Delivery Address</Text>
             <View style={styles.inputContainer}>
@@ -139,11 +109,14 @@ const handleSubmit = () => {
                 placeholderTextColor="#9CA3AF"
                 multiline
                 value={deliveryDetails.address}
-                onChangeText={(text) => setDeliveryDetails({...deliveryDetails, address: text})}
+                onChangeText={(text) =>
+                  setDeliveryDetails({ ...deliveryDetails, address: text })
+                }
               />
             </View>
           </View>
 
+          {/* Material */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Material Description</Text>
             <View style={styles.inputContainer}>
@@ -153,26 +126,37 @@ const handleSubmit = () => {
                 style={styles.input}
                 placeholderTextColor="#9CA3AF"
                 value={deliveryDetails.material}
-                onChangeText={(text) => setDeliveryDetails({...deliveryDetails, material: text})}
+                onChangeText={(text) =>
+                  setDeliveryDetails({ ...deliveryDetails, material: text })
+                }
               />
             </View>
           </View>
 
+          {/* Quantity */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Quantity</Text>
             <View style={styles.inputContainer}>
-              <Icon name="calculator-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+              <Icon
+                name="calculator-outline"
+                size={20}
+                color="#6B7280"
+                style={styles.inputIcon}
+              />
               <TextInput
                 placeholder="Enter quantity"
                 style={styles.input}
                 keyboardType="numeric"
                 placeholderTextColor="#9CA3AF"
                 value={deliveryDetails.quantity}
-                onChangeText={(text) => setDeliveryDetails({...deliveryDetails, quantity: text})}
+                onChangeText={(text) =>
+                  setDeliveryDetails({ ...deliveryDetails, quantity: text })
+                }
               />
             </View>
           </View>
 
+          {/* Upload Button */}
           <TouchableOpacity style={styles.uploadButton}>
             <Icon name="camera-outline" size={24} color="#fff" />
             <Text style={styles.uploadButtonText}>Upload Image</Text>
@@ -187,7 +171,8 @@ const handleSubmit = () => {
                   <View style={styles.signaturePreview}>
                     <Image
                       source={{ uri: signature }}
-                      style={{ width: '100%', height: 100, resizeMode: 'contain' }}
+                      style={styles.signatureImage}
+                      resizeMode="contain"
                     />
                     <View style={styles.signatureActions}>
                       <TouchableOpacity
@@ -202,7 +187,9 @@ const handleSubmit = () => {
                         onPress={clearSignature}
                       >
                         <Icon name="trash-outline" size={18} color="#EF4444" />
-                        <Text style={[styles.signatureActionText, { color: '#EF4444' }]}>Clear</Text>
+                        <Text style={[styles.signatureActionText, styles.signatureActionTextDanger]}>
+                          Clear
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -226,7 +213,7 @@ const handleSubmit = () => {
                   descriptionText="Sign above"
                   clearText="Clear"
                   confirmText="Save"
-                  webStyle={style}
+                  webStyle={signatureWebStyle}
                   autoClear
                   imageType="image/png"
                 />
@@ -240,7 +227,7 @@ const handleSubmit = () => {
             )}
           </View>
 
-          {/* Capture Location Button */}
+          {/* Location Button */}
           <TouchableOpacity
             style={styles.locationButton}
             onPress={() => navigation.navigate('MapScreen')}
@@ -249,16 +236,21 @@ const handleSubmit = () => {
             <Text style={styles.locationText}>Capture Current Location</Text>
           </TouchableOpacity>
 
-          {/* Submit Button */}
-          <TouchableOpacity 
-            style={[styles.submitButton, isLoading && { opacity: 0.7 }]} 
+          {/* Submit */}
+          <TouchableOpacity
+            style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
             onPress={handleSubmit}
             disabled={isLoading}
           >
             <Text style={styles.submitButtonText}>
               {isLoading ? 'Creating...' : 'Create Delivery Note'}
             </Text>
-            <Icon name="checkmark-circle-outline" size={24} color="#fff" style={styles.submitIcon} />
+            <Icon
+              name="checkmark-circle-outline"
+              size={24}
+              color="#fff"
+              style={styles.submitIcon}
+            />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -379,6 +371,10 @@ const styles = StyleSheet.create({
   signaturePreview: {
     padding: 15,
   },
+  signatureImage: {
+    width: '100%',
+    height: 100,
+  },
   signatureActions: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -404,6 +400,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     overflow: 'hidden',
+  },
+  signatureActionTextDanger: {
+    color: '#EF4444',
   },
   cancelSignatureButton: {
     position: 'absolute',
@@ -440,6 +439,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 16,
     borderRadius: 12,
+  },
+  submitButtonDisabled: {
+    opacity: 0.7,
   },
   submitButtonText: {
     color: '#fff',

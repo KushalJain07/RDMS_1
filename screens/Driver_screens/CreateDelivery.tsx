@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   View,
@@ -8,70 +7,36 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
-  Alert
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 
-axios.defaults.timeout = 10000; // 10 seconds timeout
-axios.defaults.headers.common['Content-Type'] = 'application/json';
+type DeliveryDetails = {
+  partyName: string;
+  address: string;
+  material: string;
+  quantity: string;
+  expectedDeliveryDate: string;
+  contactNumber: string;
+};
 
-const API_URL = 'http://10.0.2.2:5001'; // Remove /api from here
+const CreateDelivery: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<any>>();
+  const [deliveryDetails, setDeliveryDetails] = useState<DeliveryDetails>({
+    partyName: '',
+    address: '',
+    material: '',
+    quantity: '',
+    expectedDeliveryDate: '',
+    contactNumber: '',
+  });
 
-const CreateDelivery = () => {
-    const navigation = useNavigation();
-    const [isLoading, setIsLoading] = useState(false);
-    const [deliveryDetails, setDeliveryDetails] = useState({
-        partyName: '',
-        address: '',
-        material: '',
-        quantity: '',
-        expectedDeliveryDate: '',
-        contactNumber: ''
-      });
-  
-
-  function handleSubmit(){
-    const data = {
-        pname: deliveryDetails.partyName,
-        address: deliveryDetails.address,
-        material: deliveryDetails.material,
-        quantity: deliveryDetails.quantity,
-        expectedDeliveryDate: deliveryDetails.expectedDeliveryDate,
-        contactNumber: deliveryDetails.contactNumber
-    };
-
-    setIsLoading(true);
-
-    axios.post(`${API_URL}/register`, data) // Change endpoint to /register
-        .then((response) => {
-            console.log('Delivery created successfully:', response.data);
-            Alert.alert(
-                'Success', 
-                'Delivery created successfully!',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => navigation.navigate('Supplier_Dashboard', { 
-                            newDelivery: response.data,
-                            refresh: true 
-                        })
-                    }
-                ]
-            );
-        })
-        .catch((error) => {
-            console.error('Error creating delivery:', error.response?.data || error.message);
-            Alert.alert(
-                'Error', 
-                `Failed to create delivery: ${error.message}`,
-            );
-        })
-        .finally(() => {
-            setIsLoading(false);
-        });
-    }
+  function handleSubmit() {
+    Alert.alert('Note', 'This is frontend-only. API call removed for development mode.');
+    // Optional navigation example:
+    // navigation.navigate('Update');
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -80,7 +45,7 @@ const CreateDelivery = () => {
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Delivery</Text>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.content}>
@@ -89,7 +54,9 @@ const CreateDelivery = () => {
           <TextInput
             style={styles.input}
             value={deliveryDetails.partyName}
-            onChangeText={(text) => setDeliveryDetails({...deliveryDetails, partyName: text})}
+            onChangeText={(text) =>
+              setDeliveryDetails({ ...deliveryDetails, partyName: text })
+            }
             placeholder="Enter party name"
           />
 
@@ -97,7 +64,9 @@ const CreateDelivery = () => {
           <TextInput
             style={[styles.input, styles.textArea]}
             value={deliveryDetails.address}
-            onChangeText={(text) => setDeliveryDetails({...deliveryDetails, address: text})}
+            onChangeText={(text) =>
+              setDeliveryDetails({ ...deliveryDetails, address: text })
+            }
             placeholder="Enter delivery address"
             multiline
           />
@@ -106,7 +75,9 @@ const CreateDelivery = () => {
           <TextInput
             style={styles.input}
             value={deliveryDetails.material}
-            onChangeText={(text) => setDeliveryDetails({...deliveryDetails, material: text})}
+            onChangeText={(text) =>
+              setDeliveryDetails({ ...deliveryDetails, material: text })
+            }
             placeholder="Enter material type"
           />
 
@@ -114,7 +85,9 @@ const CreateDelivery = () => {
           <TextInput
             style={styles.input}
             value={deliveryDetails.quantity}
-            onChangeText={(text) => setDeliveryDetails({...deliveryDetails, quantity: text})}
+            onChangeText={(text) =>
+              setDeliveryDetails({ ...deliveryDetails, quantity: text })
+            }
             placeholder="Enter quantity"
             keyboardType="numeric"
           />
@@ -123,7 +96,9 @@ const CreateDelivery = () => {
           <TextInput
             style={styles.input}
             value={deliveryDetails.expectedDeliveryDate}
-            onChangeText={(text) => setDeliveryDetails({...deliveryDetails, expectedDeliveryDate: text})}
+            onChangeText={(text) =>
+              setDeliveryDetails({ ...deliveryDetails, expectedDeliveryDate: text })
+            }
             placeholder="DD/MM/YYYY"
           />
 
@@ -131,12 +106,14 @@ const CreateDelivery = () => {
           <TextInput
             style={styles.input}
             value={deliveryDetails.contactNumber}
-            onChangeText={(text) => setDeliveryDetails({...deliveryDetails, contactNumber: text})}
+            onChangeText={(text) =>
+              setDeliveryDetails({ ...deliveryDetails, contactNumber: text })
+            }
             placeholder="Enter contact number"
             keyboardType="phone-pad"
           />
 
-          <TouchableOpacity style={styles.submitButton} onPress={navigation.navigate('Update')}>
+          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
             <Text style={styles.submitButtonText}>Create Delivery</Text>
           </TouchableOpacity>
         </View>
@@ -203,5 +180,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  headerSpacer: {
+    width: 24,
+  },
 });
+
 export default CreateDelivery;

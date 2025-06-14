@@ -21,16 +21,10 @@ const App = () => {
           screenOptions={{headerShown: false}}
         >
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
-          <Stack.Screen name="DriverDashboard" component={DriverDashboard} />
+          <Stack.Screen name="Driver_Dashboard" component={DriverDashboard} />
           <Stack.Screen name="DeliveryDetailsScreen" component={DeliveryDetailsScreen} />
           <Stack.Screen name="DeliveryNoteScreen" component={DeliveryNoteScreen} />
-          <Stack.Screen 
-            name="SupplierDashboard" 
-            component={SupplierDashboard}
-            options={{
-              gestureEnabled: false
-            }}
-          />
+          <Stack.Screen name="SupplierDashboard" component={SupplierDashboard} options={{gestureEnabled: false}}/>
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>

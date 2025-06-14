@@ -35,7 +35,7 @@ export default function MapScreen() {
       />
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

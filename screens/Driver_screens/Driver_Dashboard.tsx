@@ -1,85 +1,87 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect  } from 'react';
 import {
   SafeAreaView,
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert
+  StyleSheet,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import axios from 'axios';
+import { useNavigation, useRoute, NavigationProp, RouteProp } from '@react-navigation/native';
 
-const API_URL = 'http://192.168.77.238:5001';
+type Delivery = {
+  _id: string;
+  pname: string;
+  material: string;
+  quantity: string;
+  expectedDeliveryDate: string;
+  address: string;
+};
 
-const Driver_Dashboard = ({ route }) => {  // Add route as a prop
-  const navigation = useNavigation();
-  const [deliveries, setDeliveries] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+type RootStackParamList = {
+  Driver_Dashboard: { refresh?: boolean } | undefined;
+  // Add other screens and their params here if needed
+};
+const Driver_Dashboard: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<any>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'Driver_Dashboard'>>();
+  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+  const [isLoading, _setIsLoading] = useState(false);
   const today = new Date();
 
+
   useEffect(() => {
-    fetchDeliveries();
+    // Simulated local data for frontend only
+    const mockDeliveries: Delivery[] = [
+      {
+        _id: '1',
+        pname: 'Singh Distributors',
+        material: 'Bricks',
+        quantity: '4000',
+        expectedDeliveryDate: getRandomDate(),
+        address: 'A-12, Old Town Rd, Indore',
+      },
+    ];
+    setDeliveries(mockDeliveries);
   }, []);
 
-  // Update the refresh effect to use optional chaining
   useEffect(() => {
     if (route?.params?.refresh) {
-      fetchDeliveries();
+      // Could trigger state reload here if needed
     }
   }, [route?.params?.refresh]);
 
   const getRandomDate = () => {
-    const today = new Date();
-    const randomDays = Math.floor(Math.random() * 20) + 1; // Random number between 1-20
-    const futureDate = new Date(today);
-    futureDate.setDate(today.getDate() + randomDays);
-    return futureDate.toISOString();
+    const future = new Date();
+    future.setDate(future.getDate() + Math.floor(Math.random() * 10) + 1);
+    return future.toISOString();
   };
 
-  const fetchDeliveries = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(`${API_URL}/deliveries`);
-      // Add random dates to each delivery
-      const deliveriesWithDates = response.data.map(delivery => ({
-        ...delivery,
-        expectedDeliveryDate: delivery.expectedDeliveryDate || getRandomDate()
-      }));
-      console.log('Fetched deliveries:', deliveriesWithDates);
-      setDeliveries(deliveriesWithDates);
-    } catch (error) {
-      console.error('Error fetching deliveries:', error);
-      Alert.alert('Error', 'Failed to fetch deliveries');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getDaysLeft = dateStr => {
+  const getDaysLeft = (dateStr: string): number => {
     const deliveryDate = new Date(dateStr);
-    const diffTime = deliveryDate - today;
+    const diffTime = deliveryDate.getTime() - today.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  // Helper to get color based on days left
-  const getTimeColor = daysLeft => {
-    if (daysLeft <= 0) return 'red';
-    if (daysLeft <= 3) return 'orange';
-    if (daysLeft <= 7) return 'green';
+  const getTimeColor = (daysLeft: number): string => {
+    if (daysLeft <= 0) {
+      return 'red';
+    }
+    if (daysLeft <= 3) {
+      return 'orange';
+    }
+    if (daysLeft <= 7) {
+      return 'green';
+    }
     return '#555';
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('LoginScreen')}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')} style={styles.backButton}>
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>DRIVER DASHBOARD</Text>
@@ -95,8 +97,10 @@ const Driver_Dashboard = ({ route }) => {  // Add route as a prop
           <Text style={styles.loadingText}>Loading deliveries...</Text>
         ) : (
           deliveries
-            .sort((a, b) => new Date(a.expectedDeliveryDate) - new Date(b.expectedDeliveryDate))
-            .map(delivery => {
+            .sort((a, b) =>
+              new Date(a.expectedDeliveryDate).getTime() - new Date(b.expectedDeliveryDate).getTime()
+            )
+            .map((delivery) => {
               const daysLeft = getDaysLeft(delivery.expectedDeliveryDate);
               const timeColor = getTimeColor(daysLeft);
               const formattedDate = new Date(delivery.expectedDeliveryDate).toDateString();
@@ -120,12 +124,9 @@ const Driver_Dashboard = ({ route }) => {  // Add route as a prop
                         : `In ${daysLeft} day${daysLeft > 1 ? 's' : ''} (${formattedDate})`}
                     </Text>
                     <TouchableOpacity
-                      onPress={() => {
-                        console.log('Navigating with delivery:', delivery);
-                        navigation.navigate('DeliveryDetailsScreen', {
-                          deliveryData: delivery
-                        });
-                      }}
+                      onPress={() =>
+                        navigation.navigate('DeliveryDetailsScreen', { deliveryData: delivery })
+                      }
                       style={styles.detailsButton}
                     >
                       <Text style={styles.viewDetails}>View Details</Text>
@@ -135,65 +136,6 @@ const Driver_Dashboard = ({ route }) => {  // Add route as a prop
               );
             })
         )}
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
-
-const DeliveryDetailsScreen = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
-  const delivery = route.params?.deliveryData;
-
-  if (!delivery) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <TouchableOpacity 
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Icon name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Error</Text>
-        </View>
-        <View style={styles.content}>
-          <Text>No delivery data available</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Icon name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Delivery Details</Text>
-      </View>
-      <ScrollView style={styles.content}>
-        <View style={styles.detailCard}>
-          <Text style={styles.label}>Party Name</Text>
-          <Text style={styles.value}>{delivery.pname}</Text>
-          
-          <Text style={styles.label}>Address</Text>
-          <Text style={styles.value}>{delivery.address}</Text>
-          
-          <Text style={styles.label}>Material</Text>
-          <Text style={styles.value}>{delivery.material}</Text>
-          
-          <Text style={styles.label}>Quantity</Text>
-          <Text style={styles.value}>{delivery.quantity}</Text>
-          
-          <Text style={styles.label}>Expected Delivery</Text>
-          <Text style={styles.value}>
-            {new Date(delivery.expectedDeliveryDate).toLocaleDateString()}
-          </Text>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -280,7 +222,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#666',
     marginTop: 20,
-    fontSize: 16
+    fontSize: 16,
+  },
+  detailsButton: {
+    alignSelf: 'flex-start',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    backgroundColor: '#E0F7FA',
   },
   detailCard: {
     backgroundColor: '#fff',

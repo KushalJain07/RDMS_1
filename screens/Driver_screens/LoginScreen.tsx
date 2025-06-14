@@ -9,18 +9,20 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+
+type UserRole = 'Driver' | 'Supplier';
 
 export default function LoginScreen() {
-  const navigation = useNavigation();
-  const [selectedRole, setSelectedRole] = useState('Driver');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const navigation = useNavigation<NavigationProp<any>>();
+  const [selectedRole, setSelectedRole] = useState<UserRole>('Driver');
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const handleLogin = () => {
     if (selectedRole === 'Driver') {
-navigation.navigate('DriverDashboard');
+      navigation.navigate('Driver_Dashboard');
     } else if (selectedRole === 'Supplier') {
       navigation.navigate('DeliveryNoteScreen');
     }
@@ -43,14 +45,14 @@ navigation.navigate('DriverDashboard');
         <Text style={styles.signInHeading}>Sign in</Text>
 
         <View style={styles.toggleContainer}>
-          {['Driver', 'Supplier'].map(role => (
+          {['Driver', 'Supplier'].map((role) => (
             <TouchableOpacity
               key={role}
               style={[
                 styles.toggleButton,
                 selectedRole === role && styles.toggleButtonSelected,
               ]}
-              onPress={() => setSelectedRole(role)}
+              onPress={() => setSelectedRole(role as UserRole)}
             >
               <Text
                 style={[
@@ -89,7 +91,6 @@ navigation.navigate('DriverDashboard');
         <Text style={styles.link}>Sign up</Text>
       </View>
 
-      {/* Forgot Password Modal */}
       <Modal
         visible={isModalVisible}
         transparent
