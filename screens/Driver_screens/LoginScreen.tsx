@@ -24,7 +24,7 @@ export default function LoginScreen() {
     if (selectedRole === 'Driver') {
       navigation.navigate('Driver_Dashboard');
     } else if (selectedRole === 'Supplier') {
-      navigation.navigate('DeliveryNoteScreen');
+      navigation.navigate('TabNavigator');
     }
   };
 
