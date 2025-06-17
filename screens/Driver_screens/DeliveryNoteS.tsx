@@ -1,42 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
   TextInput,
-  StyleSheet,
-  ScrollView,
   TouchableOpacity,
+  ScrollView,
   Alert,
   StatusBar,
   Image,
-  KeyboardAvoidingView,
-  Platform
+  StyleSheet,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SignatureScreen from 'react-native-signature-canvas';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { Picker } from '@react-native-picker/picker';
-import axios from 'axios';
 
-interface DeliveryDetails {
+type DeliveryDetails = {
   partyName: string;
   address: string;
   material: string;
   quantity: string;
-}
+  expectedDeliveryDate: string;
+  contactNumber: string;
+};
 
-const DeliveryNoteScreen: React.FC = () => {
+export default function DeliveryNoteScreen() {
   const navigation = useNavigation<NavigationProp<any>>();
   const [signature, setSignature] = useState<string | null>(null);
   const [showSignaturePad, setShowSignaturePad] = useState<boolean>(false);
-  const signatureRef = React.useRef<any>(null);
+  const signatureRef = useRef<any>(null);
 
   const [deliveryDetails, setDeliveryDetails] = useState<DeliveryDetails>({
-    partyName: 'Mr. Gupta', // Set default value
+    partyName: '',
     address: '',
-    material: 'Cement', // Set default value
+    material: '',
     quantity: '',
+    expectedDeliveryDate: '',
+    contactNumber: '',
   });
 
   const [isLoading, _setIsLoading] = useState<boolean>(false);
@@ -55,95 +54,19 @@ const DeliveryNoteScreen: React.FC = () => {
     setSignature(null);
   };
 
-  const handleSubmit = async () => {
-    // Log form data to check values
-    console.log('Form Data:', deliveryDetails);
-
-    // Check if any field is empty
-    const emptyFields = Object.entries(deliveryDetails).filter(([_, value]) => !value.trim());
-
-    if (emptyFields.length > 0) {
-      const emptyFieldNames = emptyFields.map(([key]) => key).join(', ');
-      console.log('Empty fields:', emptyFieldNames);
-      Alert.alert('Error', `Please fill in all fields: ${emptyFieldNames}`);
+  const handleSubmit = () => {
+    if (!deliveryDetails.partyName || !deliveryDetails.address || !deliveryDetails.material) {
+      Alert.alert('Error', 'Please fill in all required fields');
       return;
     }
 
-    // Basic validation for quantity
-    if (!deliveryDetails.quantity || isNaN(Number(deliveryDetails.quantity))) {
-      Alert.alert('Error', 'Please enter a valid quantity');
-      return;
-    }
-
-    try {
-      const response = await axios.post('http://192.168.77.238:5001/register', {
-        pname: deliveryDetails.partyName || 'Default Party', // Provide default values
-        address: deliveryDetails.address || 'Not specified',
-        material: deliveryDetails.material || 'Default Material',
-        quantity: parseInt(deliveryDetails.quantity),
-        
-      });
-
-      console.log('API Response:', response.data);
-      Alert.alert('Success', 'Delivery note created successfully');
-      // Reset form after successful submission
-      setDeliveryDetails({
-        partyName: 'Mr. Gupta',
-        address: '',
-        material: 'Cement',
-        quantity: '',
-        expectedDeliveryDate: '',
-        expectedTime: '',
-      });
-    } catch (error) {
-      console.error('API Error:', error);
-      Alert.alert('Error', 'Failed to create delivery note');
-    }
+    Alert.alert('Saved Locally', 'This is a frontend-only mockup for now.');
   };
 
-  // Dropdown states for Party Name
-  const [openParty, setOpenParty] = useState(false);
-  const [partyValue, setPartyValue] = useState(null);
-  const [parties, setParties] = useState([
-    { label: 'Mr. Gupta', value: 'Mr. Gupta' },
-    { label: 'Mrs. Sharma', value: 'Mrs. Sharma' },
-    // Add more party names as needed
-  ]);
-
-  // Dropdown states for Material
-  const [openMaterial, setOpenMaterial] = useState(false);
-  const [materialValue, setMaterialValue] = useState(null);
-  const [materials, setMaterials] = useState([
-    { label: 'Cement', value: 'Cement' },
-    { label: 'Steel', value: 'Steel' },
-    { label: 'Bricks', value: 'Bricks' },
-    // Add more materials as needed
-  ]);
-
-  // Fetch dropdown data
-  useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        const [partiesRes, materialsRes] = await Promise.all([
-          axios.get('http://192.168.77.238:5001/parties'),
-          axios.get('http://192.168.77.238:5001/materials')
-        ]);
-        setParties(partiesRes.data);
-        setMaterials(materialsRes.data);
-      } catch (error) {
-        console.error('Error fetching dropdown data:', error);
-      }
-    };
-    fetchDropdownData();
-  }, []);
-
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
+    <>
       <StatusBar barStyle="light-content" backgroundColor="#4A90E2" />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
@@ -158,21 +81,22 @@ const DeliveryNoteScreen: React.FC = () => {
         </View>
 
         <View style={styles.formContainer}>
-          {/* Party Name Dropdown */}
-          <Text style={styles.label}>Party Name</Text>
-          <DropDownPicker
-            open={openParty}
-            value={partyValue}
-            items={parties}
-            setOpen={setOpenParty}
-            setValue={setPartyValue}
-            setItems={setParties}
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdownContainer}
-            placeholder="Select Party Name"
-            zIndex={3000}
-            zIndexInverse={1000}
-          />
+          {/* Party Name Input */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Party Name</Text>
+            <View style={styles.inputContainer}>
+              <Icon name="people-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+              <TextInput
+                placeholder="Enter party name"
+                style={styles.input}
+                placeholderTextColor="#9CA3AF"
+                value={deliveryDetails.partyName}
+                onChangeText={(text) =>
+                  setDeliveryDetails({ ...deliveryDetails, partyName: text })
+                }
+              />
+            </View>
+          </View>
 
           {/* Address */}
           <View style={styles.inputGroup}>
@@ -192,21 +116,22 @@ const DeliveryNoteScreen: React.FC = () => {
             </View>
           </View>
 
-          {/* Material Dropdown */}
-          <Text style={styles.label}>Material</Text>
-          <DropDownPicker
-            open={openMaterial}
-            value={materialValue}
-            items={materials}
-            setOpen={setOpenMaterial}
-            setValue={setMaterialValue}
-            setItems={setMaterials}
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdownContainer}
-            placeholder="Select Material"
-            zIndex={2000}
-            zIndexInverse={2000}
-          />
+          {/* Material */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Material Description</Text>
+            <View style={styles.inputContainer}>
+              <Icon name="cube-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+              <TextInput
+                placeholder="Describe the material"
+                style={styles.input}
+                placeholderTextColor="#9CA3AF"
+                value={deliveryDetails.material}
+                onChangeText={(text) =>
+                  setDeliveryDetails({ ...deliveryDetails, material: text })
+                }
+              />
+            </View>
+          </View>
 
           {/* Quantity */}
           <View style={styles.inputGroup}>
@@ -329,16 +254,12 @@ const DeliveryNoteScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  scrollContainer: {
     flexGrow: 1,
     backgroundColor: '#F9FAFB',
     paddingBottom: 20,
@@ -373,7 +294,6 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     padding: 20,
-    flex: 1,
   },
   inputGroup: {
     marginBottom: 20,
@@ -531,24 +451,4 @@ const styles = StyleSheet.create({
   submitIcon: {
     marginLeft: 8,
   },
-  dropdown: {
-    backgroundColor: '#fff',
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  dropdownContainer: {
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: '#333',
-    fontWeight: '500',
-  },
 });
-
-export default DeliveryNoteScreen;

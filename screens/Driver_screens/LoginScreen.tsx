@@ -9,12 +9,17 @@ import {
   ScrollView,
   Modal,
 } from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../types/navigation';
 
 type UserRole = 'Driver' | 'Supplier';
 
-export default function LoginScreen() {
-  const navigation = useNavigation<NavigationProp<any>>();
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+const LoginScreen: React.FC = () => {
+  const navigation = useNavigation();
+
   const [selectedRole, setSelectedRole] = useState<UserRole>('Driver');
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -22,7 +27,7 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
     if (selectedRole === 'Driver') {
-      navigation.navigate('Driver_Dashboard');
+      navigation.navigate('DeliveryNote');
     } else if (selectedRole === 'Supplier') {
       navigation.navigate('TabNavigator');
     }
@@ -114,7 +119,7 @@ export default function LoginScreen() {
       </Modal>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   scrollContainer: {
@@ -241,3 +246,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+export default LoginScreen;
