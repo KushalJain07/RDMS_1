@@ -1,10 +1,16 @@
 export const Theme = {
   Colors: {
-    // Core brand color for buttons, highlights
-    primary: '#0B72B9',        // Blue
-    primaryDark: '#085A94',
+    // Core theme colors
+    primary: '#007BFF',         // Blue
+    primaryDark: '#0056b3',
 
-    // Neutral palette
+    // Accent colors
+    secondary: '#FFA500',       // Orange
+    success: '#28A745',         // Green
+    warning: '#FFC107',
+    danger: '#DC3545',
+
+    // Neutrals
     white: '#FFFFFF',
     black: '#000000',
     black90: '#1A1A1A',
@@ -14,13 +20,12 @@ export const Theme = {
     lightGray: '#E0E0E0',
     background: '#F9F9F9',
 
-    // Accent colors
-    success: '#28A745',        // Green
-    warning: '#FFC107',
-    danger: '#DC3545',
-    activeTabColor: '#FF8C00',
-    // Custom extension
-    
+    // Navigation specific
+    activeNavBackground: '#007BFF',  // Blue
+    inactiveNavBackground: '#FFFFFF',
+    activeNavText: '#FFFFFF',
+    inactiveNavText: '#7D7D7D',
+    navIconColor: '#7D7D7D',
   },
 
   Fonts: {

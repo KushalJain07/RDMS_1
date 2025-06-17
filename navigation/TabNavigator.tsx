@@ -6,46 +6,50 @@ import TrucksScreen from '../screens/Driver_screens/TrucksScreen';
 import CustomersScreen from '../screens/Driver_screens/CustomersScreen';
 import InvoiceScreen from '../screens/Driver_screens/InvoiceScreen';
 import Add_Truck from '../screens/Driver_screens/Add_Truck';
-import AddCustomer from '../screens/Driver_screens/AddCustomer'; // Updated import name
+import AddCustomer from '../screens/Driver_screens/AddCustomer';
 import { TabParamList } from '../types/navigation';
+import { Theme } from '../constants/theme';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-interface IconMapping {
-  [key: string]: string;
-}
+const iconMapping: Record<string, string> = {
+  Trucks: 'local-shipping',
+  Customers: 'people',
+  Invoices: 'receipt-long',
+};
 
 const TabNavigator: React.FC = () => {
-  const iconMapping: IconMapping = {
-    Trucks: 'local-shipping',
-    Customers: 'people',
-    Invoices: 'receipt-long',
-  };
-
   return (
     <Tab.Navigator
       initialRouteName="Trucks"
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarIcon: ({ color, size }) => (
+        tabBarIcon: ({ color }) => (
           <MaterialIcons
             name={iconMapping[route.name] || 'error'}
-            size={size}
+            size={24} // Match native icon scale
             color={color}
+            style={{ marginBottom: -2 }} // Slight adjustment for perfect vertical alignment
           />
         ),
-        tabBarActiveTintColor: '#007B7F',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: Theme.Colors.activeNavBackground,
+        tabBarInactiveTintColor: Theme.Colors.navIconColor,
         tabBarStyle: {
           height: Platform.OS === 'ios' ? 85 : 65,
-          paddingBottom: Platform.OS === 'ios' ? 25 : 10,
-          backgroundColor: '#FFFFFF',
+          paddingTop: 8,
+          paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+          backgroundColor: Theme.Colors.inactiveNavBackground,
           borderTopWidth: 1,
-          borderTopColor: '#E5E5E5',
+          borderTopColor: Theme.Colors.lightGray,
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '500',
+          fontWeight: '600',
+          paddingBottom: 2,
+        },
+        tabBarItemStyle: {
+          justifyContent: 'center',
+          alignItems: 'center',
         },
       })}
     >
@@ -73,7 +77,7 @@ const TabNavigator: React.FC = () => {
         options={{ tabBarLabel: 'Invoices' }}
       />
       <Tab.Screen
-        name="AddCustomer" // Changed from Add_Customer
+        name="AddCustomer"
         component={AddCustomer}
         options={{
           tabBarButton: () => null,
