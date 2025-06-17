@@ -11,58 +11,20 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Theme } from '../../constants/theme';
-import { useNavigation } from '@react-navigation/native';
+// import { useNavigation } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { TabParamList } from '../../types/navigation';
 
 const { Colors, FontSizes, FontWeights, Spacing, BorderRadius } = Theme;
 
-type Site = {
-  id: string;
-  address: string;
-};
-
-type Customer = {
-  id: string;
-  name: string;
-  company: string;
-  contact: string;
-  sites: Site[];
-};
+import { Customer } from '../../src/types';
+import { customers as mockCustomers } from '../../src/mockData';
 
 type Props = BottomTabScreenProps<TabParamList, 'Customers'>;
 
 const CustomersScreen: React.FC<Props> = ({ navigation }) => {
   const [expandedCustomerId, setExpandedCustomerId] = useState<string | null>(null);
-
-  const [customers, setCustomers] = useState<Customer[]>([
-    {
-      id: '1',
-      name: 'Ramesh Kumar',
-      company: 'Kumar Logistics Pvt. Ltd.',
-      contact: '+91 9876543210',
-      sites: [
-        { id: '1', address: 'Plot 23, Transport Nagar, Nagpur' },
-        { id: '2', address: 'Warehouse 7, Industrial Zone, Pune' },
-      ],
-    },
-    {
-      id: '2',
-      name: 'Sneha Jain',
-      company: 'Jain Transport Services',
-      contact: '+91 9123456789',
-      sites: [
-        { id: '1', address: 'Jain Hub, Sector 15, Mumbai' },
-      ],
-    },
-    {
-      id: '3',
-      name: 'Rajeev Mehta',
-      company: 'Mehta Cargo Movers',
-      contact: '+91 9988776655',
-      sites: [],
-    },
-  ]);
+  const [customers, _setCustomers] = useState<Customer[]>(mockCustomers);
 
   const toggleSites = (customerId: string) => {
     setExpandedCustomerId((prevId) => (prevId === customerId ? null : customerId));
@@ -169,7 +131,7 @@ const styles = StyleSheet.create({
   },
   nameText: {
     fontSize: FontSizes.medium,
-    fontWeight: FontWeights.bold,
+    fontWeight: '700',
     color: Colors.black,
     fontFamily: 'monospace',
     marginLeft: Spacing.sm,
@@ -188,7 +150,7 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontSize: FontSizes.small,
     marginTop: Spacing.sm,
-    fontWeight: FontWeights.medium,
+    fontWeight: '500',
   },
   siteAddress: {
     marginLeft: Spacing.md,
@@ -214,7 +176,7 @@ const styles = StyleSheet.create({
   floatingAddButtonText: {
     color: Colors.white,
     fontSize: FontSizes.medium,
-    fontWeight: FontWeights.bold,
+    fontWeight: '700',
     marginLeft: Spacing.xs,
   },
   bottomNav: {

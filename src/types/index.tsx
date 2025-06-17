@@ -16,3 +16,13 @@ export interface DriverDelivery {
   quantity: string;
   expectedDeliveryDate: string;
 }
+
+export interface Truck {
+  id: string;
+  number: string;
+  driverName: string;
+  status: string;
+}
+
+export * from './customers';
+export * from './invoices';

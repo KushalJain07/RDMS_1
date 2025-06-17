@@ -10,12 +10,12 @@ import {
   Modal,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../types/navigation';
+// import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+// import { RootStackParamList } from '../../types/navigation';
 
 type UserRole = 'Driver' | 'Supplier';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+// type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const LoginScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -27,9 +27,9 @@ const LoginScreen: React.FC = () => {
 
   const handleLogin = () => {
     if (selectedRole === 'Driver') {
-      navigation.navigate('DeliveryNote');
+        navigation.navigate('DeliveryNote' as never);
     } else if (selectedRole === 'Supplier') {
-      navigation.navigate('TabNavigator');
+      navigation.navigate('TabNavigator' as never);
     }
   };
 

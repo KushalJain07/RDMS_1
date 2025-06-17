@@ -18,12 +18,8 @@
     "react": "19.0.0",
     "react-is": "^19.1.0",
     "react-native": "0.79.3",
-<<<<<<< HEAD
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-gesture-handler": "^2.25.0",
-=======
-    "react-native-gesture-handler": "^2.26.0",
->>>>>>> 50f6cbeea37f3d44391d4153a5dd788ee1647582
     "react-native-linear-gradient": "^2.8.3",
     "react-native-reanimated": "^3.18.0",
     "react-native-safe-area-context": "^5.4.1",
