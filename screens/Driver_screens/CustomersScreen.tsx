@@ -32,8 +32,7 @@ type Customer = {
 
 type Props = BottomTabScreenProps<TabParamList, 'Customers'>;
 
-const CustomersScreen: React.FC = () => {
-  const navigation = useNavigation();
+const CustomersScreen: React.FC<Props> = ({ navigation }) => {
   const [expandedCustomerId, setExpandedCustomerId] = useState<string | null>(null);
 
   const [customers, setCustomers] = useState<Customer[]>([
@@ -115,7 +114,7 @@ const CustomersScreen: React.FC = () => {
       </ScrollView>
 
       {/* Floating Add Customer Button */}
-      <TouchableOpacity style={styles.floatingAddButton}>
+      <TouchableOpacity style={styles.floatingAddButton}  onPress={() => navigation.navigate('AddCustomer')}>
         <Icon name="add" size={20} color={Colors.white} />
         <Text style={styles.floatingAddButtonText}>Add Customer</Text>
       </TouchableOpacity>

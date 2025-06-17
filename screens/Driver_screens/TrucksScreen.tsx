@@ -11,6 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Theme } from '../../constants/theme';
+import AddTruck from '../screens/Driver_screens/Add_Truck';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { TabParamList } from '../../types/navigation';
@@ -39,7 +40,7 @@ const TrucksScreen: React.FC<Props> = ({ navigation }) => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
           <Icon name="arrow-back" size={24} color={Colors.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Trucks</Text>
@@ -63,7 +64,7 @@ const TrucksScreen: React.FC<Props> = ({ navigation }) => {
       </ScrollView>
 
       {/* Floating Add Truck Button */}
-      <TouchableOpacity style={styles.floatingAddButton}>
+      <TouchableOpacity style={styles.floatingAddButton} onPress={() => navigation.navigate('Add_Truck')}>
         <Icon name="add" size={20} color={Colors.white} />
         <Text style={styles.floatingAddButtonText}>Add Truck</Text>
       </TouchableOpacity>

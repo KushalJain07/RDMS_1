@@ -5,6 +5,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import TrucksScreen from '../screens/Driver_screens/TrucksScreen';
 import CustomersScreen from '../screens/Driver_screens/CustomersScreen';
 import InvoiceScreen from '../screens/Driver_screens/InvoiceScreen';
+import Add_Truck from '../screens/Driver_screens/Add_Truck';
+import AddCustomer from '../screens/Driver_screens/AddCustomer'; // Updated import name
 import { TabParamList } from '../types/navigation';
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -53,6 +55,14 @@ const TabNavigator: React.FC = () => {
         options={{ tabBarLabel: 'Trucks' }}
       />
       <Tab.Screen
+        name="Add_Truck"
+        component={Add_Truck}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+      <Tab.Screen
         name="Customers"
         component={CustomersScreen}
         options={{ tabBarLabel: 'Customers' }}
@@ -61,6 +71,14 @@ const TabNavigator: React.FC = () => {
         name="Invoices"
         component={InvoiceScreen}
         options={{ tabBarLabel: 'Invoices' }}
+      />
+      <Tab.Screen
+        name="AddCustomer" // Changed from Add_Customer
+        component={AddCustomer}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: 'none' },
+        }}
       />
     </Tab.Navigator>
   );
