@@ -119,31 +119,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.floatingAddButtonText}>Add Customer</Text>
       </TouchableOpacity>
 
-      {/* Bottom Navigation */}
-      {/* <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="local-shipping" size={24} color={Colors.gray} />
-          <Text style={styles.navText}>Trucks</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.navItem,
-            {
-              backgroundColor: Colors.activeTabColor,
-              borderRadius: BorderRadius.lg,
-            },
-          ]}
-        >
-          <MaterialIcons name="people" size={24} color={Colors.white} />
-          <Text style={[styles.navText, { color: Colors.white }]}>Customers</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="receipt-long" size={24} color={Colors.gray} />
-          <Text style={styles.navText}>Invoices</Text>
-        </TouchableOpacity>
-      </View> */}
     </SafeAreaView>
   );
 };
