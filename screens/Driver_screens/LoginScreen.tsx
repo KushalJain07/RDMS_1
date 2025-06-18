@@ -8,6 +8,7 @@ import {
   Image,
   ScrollView,
   Modal,
+  Animated,
 } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 
@@ -19,6 +20,7 @@ export default function LoginScreen() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [contentOpacity] = useState(new Animated.Value(1));
 
   const handleLogin = () => {
     if (selectedRole === 'Driver') {
@@ -32,9 +34,27 @@ export default function LoginScreen() {
     setIsModalVisible(true);
   };
 
+  const switchRole = (role: UserRole) => {
+    Animated.sequence([
+      Animated.timing(contentOpacity, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(contentOpacity, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setSelectedRole(role);
+    });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
+        {/* Logo */}
         <View style={styles.logoContainer}>
           <Image
             source={require('../../public/images/logo.png')}
@@ -42,8 +62,10 @@ export default function LoginScreen() {
           />
         </View>
 
+        {/* Heading */}
         <Text style={styles.signInHeading}>Sign in</Text>
 
+        {/* Role Toggle */}
         <View style={styles.toggleContainer}>
           {['Driver', 'Supplier'].map((role) => (
             <TouchableOpacity
@@ -52,7 +74,7 @@ export default function LoginScreen() {
                 styles.toggleButton,
                 selectedRole === role && styles.toggleButtonSelected,
               ]}
-              onPress={() => setSelectedRole(role as UserRole)}
+              onPress={() => switchRole(role as UserRole)}
             >
               <Text
                 style={[
@@ -66,31 +88,39 @@ export default function LoginScreen() {
           ))}
         </View>
 
-        <TextInput
-          placeholder="Username"
-          style={styles.input}
-          value={username}
-          onChangeText={setUsername}
-        />
-        <TextInput
-          placeholder="Password"
-          secureTextEntry
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-        />
+        {/* Animated Login Form */}
+        <Animated.View style={{ opacity: contentOpacity }}>
+          <TextInput
+            placeholder="Username"
+            style={styles.input}
+            value={username}
+            onChangeText={setUsername}
+          />
+          <TextInput
+            placeholder="Password"
+            secureTextEntry
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+          />
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Log in</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.loginButtonText}>Log in</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleForgotPassword}>
-          <Text style={styles.link}>Forgot password?</Text>
-        </TouchableOpacity>
+          {selectedRole === 'Supplier' && (
+            <>
+              <TouchableOpacity onPress={handleForgotPassword}>
+                <Text style={styles.link}>Forgot password?</Text>
+              </TouchableOpacity>
 
-        <Text style={styles.link}>Sign up</Text>
+              <Text style={styles.link}>Sign up</Text>
+            </>
+          )}
+        </Animated.View>
       </View>
 
+      {/* Forgot Password Modal */}
       <Modal
         visible={isModalVisible}
         transparent
@@ -121,7 +151,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     backgroundColor: '#F3F4F6',
-    paddingVertical: 20, // Added vertical padding for extra spacing
+    paddingVertical: 20,
   },
   container: {
     padding: 30,
@@ -135,7 +165,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 30, // increased spacing
+    marginBottom: 30,
   },
   logo: {
     width: 100,
@@ -155,7 +185,7 @@ const styles = StyleSheet.create({
   toggleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    marginBottom: 30, // increased spacing
+    marginBottom: 30,
     backgroundColor: '#E5E7EB',
     borderRadius: 8,
     padding: 4,

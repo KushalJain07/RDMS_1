@@ -11,8 +11,6 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Theme } from '../../constants/theme';
-import AddTruck from '../screens/Driver_screens/Add_Truck';
-import { useNavigation } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { TabParamList } from '../../types/navigation';
 
@@ -22,7 +20,7 @@ type Truck = {
   id: string;
   number: string;
   driverName: string;
-  status: string;
+  status: 'Active' | 'In Transit' | 'Inactive';
 };
 
 type Props = BottomTabScreenProps<TabParamList, 'Trucks'>;
@@ -34,56 +32,59 @@ const TrucksScreen: React.FC<Props> = ({ navigation }) => {
     { id: '3', number: 'MH 12 AB-9876', driverName: 'Sunil Deshmukh', status: 'Active' },
   ]);
 
+  const getStatusStyles = (status: Truck['status']) => {
+    switch (status) {
+      case 'Active':
+        return { backgroundColor: '#DFF2E1', color: '#2E7D32' };
+      case 'In Transit':
+        return { backgroundColor: '#FFF8E1', color: '#F9A825' };
+      case 'Inactive':
+        return { backgroundColor: '#FFEBEE', color: '#C62828' };
+      default:
+        return { backgroundColor: '#ECEFF1', color: '#607D8B' };
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={24} color={Colors.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Trucks</Text>
         <View style={{ width: 24 }} />
       </View>
 
-      {/* Truck List */}
-      <ScrollView contentContainerStyle={styles.listContainer}>
-        {trucks.map((truck) => (
-          <View key={truck.id} style={styles.truckCard}>
-            <View style={styles.truckHeader}>
-              <MaterialIcons name="local-shipping" size={22} color={Colors.primary} />
-              <Text style={styles.truckNumber}>{truck.number}</Text>
+      {/* Truck List with Add Button at End */}
+      <ScrollView contentContainerStyle={styles.listContainer} showsVerticalScrollIndicator={false}>
+        {trucks.map((truck) => {
+          const { backgroundColor, color } = getStatusStyles(truck.status);
+          return (
+            <View key={truck.id} style={styles.truckCard}>
+              <View style={styles.truckHeader}>
+                <MaterialIcons name="local-shipping" size={22} color={Colors.primary} />
+                <Text style={styles.truckNumber}>{truck.number}</Text>
+              </View>
+              <Text style={styles.driverName}>Driver: {truck.driverName}</Text>
+              <View style={[styles.statusBadge, { backgroundColor }]}>
+                <Text style={[styles.statusText, { color }]}>{truck.status}</Text>
+              </View>
             </View>
-            <Text style={styles.driverName}>Driver: {truck.driverName}</Text>
-            <View style={styles.statusBadge}>
-              <Text style={styles.statusText}>{truck.status}</Text>
-            </View>
-          </View>
-        ))}
+          );
+        })}
+
+        {/* Add Truck Button BELOW the last card */}
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate('Add_Truck')}
+        >
+          <Icon name="add-circle" size={22} color={Colors.white} />
+          <Text style={styles.addButtonText}>Add New Truck</Text>
+        </TouchableOpacity>
       </ScrollView>
-
-      {/* Floating Add Truck Button */}
-      <TouchableOpacity style={styles.floatingAddButton} onPress={() => navigation.navigate('Add_Truck')}>
-        <Icon name="add" size={20} color={Colors.white} />
-        <Text style={styles.floatingAddButtonText}>Add Truck</Text>
-      </TouchableOpacity>
-
-      {/* Bottom Navigation */}
-      {/* <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
-           <MaterialIcons name="local-shipping" size={24} color={Colors.gray} />
-           <Text style={styles.navText}>Trucks</Text>
-           </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="people" size={24} color={Colors.gray} />
-          <Text style={styles.navText}>Customers</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <MaterialIcons name="receipt-long" size={24} color={Colors.gray} />
-          <Text style={styles.navText}>Invoices</Text>
-        </TouchableOpacity>
-      </View> */}
     </SafeAreaView>
   );
 };
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingHorizontal: Spacing.lg,
-    paddingBottom: 150,
+    paddingBottom: Spacing.xxl,
     paddingTop: Spacing.md,
   },
   truckCard: {
@@ -120,9 +121,10 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.md,
     marginBottom: Spacing.md,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
-    elevation: 2,
+    elevation: 3,
     borderLeftWidth: 5,
     borderLeftColor: Colors.primary,
   },
@@ -145,67 +147,35 @@ const styles = StyleSheet.create({
   },
   statusBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#DFF2E1',
     paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
+    paddingVertical: 4,
     borderRadius: 999,
+    marginTop: 4,
   },
   statusText: {
-    fontSize: FontSizes.small - 2,
-    color: '#2E7D32',
+    fontSize: FontSizes.small - 1,
     fontWeight: FontWeights.bold,
   },
-  floatingAddButton: {
-    position: 'absolute',
-    right: Spacing.lg,
-    bottom: 100,
-    backgroundColor: Colors.primary,
+  addButton: {
+    marginTop: Spacing.lg,
     flexDirection: 'row',
+    backgroundColor: Colors.primary,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.lg,
+    alignSelf: 'center',
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 4,
   },
-  floatingAddButtonText: {
+  addButtonText: {
     color: Colors.white,
     fontSize: FontSizes.medium,
     fontWeight: FontWeights.bold,
-    marginLeft: Spacing.xs,
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: Spacing.sm,
-    backgroundColor: Colors.white,
-    borderTopWidth: 1,
-    borderTopColor: Colors.lightGray,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  navItem: {
-    alignItems: 'center',
-    padding: Spacing.sm,
-  },
-  navText: {
-    fontSize: FontSizes.small,
-    color: '#444',
-  },
-  navItemActive: {
-    alignItems: 'center',
-    backgroundColor: 'green',
-    padding: Spacing.sm,
-    borderRadius: BorderRadius.lg,
-  },
-  navTextActive: {
-    fontSize: FontSizes.small,
-    color: Colors.white,
-    fontWeight: FontWeights.bold,
+    marginLeft: Spacing.sm,
   },
 });
 

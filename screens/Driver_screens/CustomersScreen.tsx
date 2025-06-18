@@ -11,7 +11,6 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Theme } from '../../constants/theme';
-import { useNavigation } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { TabParamList } from '../../types/navigation';
 
@@ -35,7 +34,7 @@ type Props = BottomTabScreenProps<TabParamList, 'Customers'>;
 const CustomersScreen: React.FC<Props> = ({ navigation }) => {
   const [expandedCustomerId, setExpandedCustomerId] = useState<string | null>(null);
 
-  const [customers, setCustomers] = useState<Customer[]>([
+  const [customers] = useState<Customer[]>([
     {
       id: '1',
       name: 'Ramesh Kumar',
@@ -65,7 +64,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
   ]);
 
   const toggleSites = (customerId: string) => {
-    setExpandedCustomerId((prevId) => (prevId === customerId ? null : customerId));
+    setExpandedCustomerId(prev => (prev === customerId ? null : customerId));
   };
 
   return (
@@ -82,7 +81,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
       </View>
 
       {/* Customer List */}
-      <ScrollView contentContainerStyle={styles.listContainer}>
+      <ScrollView contentContainerStyle={styles.listContainer} showsVerticalScrollIndicator={false}>
         {customers.map((customer) => (
           <View key={customer.id} style={styles.customerCard}>
             <View style={styles.customerHeader}>
@@ -90,8 +89,8 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
               <Text style={styles.nameText}>{customer.name}</Text>
             </View>
 
-            <Text style={styles.companyText}>Company: {customer.company}</Text>
-            <Text style={styles.companyText}>Contact: {customer.contact}</Text>
+            <Text style={styles.detailText}>Company: <Text style={styles.detailValue}>{customer.company}</Text></Text>
+            <Text style={styles.detailText}>Contact: <Text style={styles.detailValue}>{customer.contact}</Text></Text>
             <Text style={styles.customerIdText}>Customer ID: {customer.id}</Text>
 
             {customer.sites.length > 0 && (
@@ -103,7 +102,7 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
             )}
 
             {expandedCustomerId === customer.id && customer.sites.length > 0 && (
-              <View>
+              <View style={{ marginTop: Spacing.sm }}>
                 {customer.sites.map((site) => (
                   <Text key={site.id} style={styles.siteAddress}>• {site.address}</Text>
                 ))}
@@ -111,15 +110,16 @@ const CustomersScreen: React.FC<Props> = ({ navigation }) => {
             )}
           </View>
         ))}
+
+        {/* Add Button inside ScrollView */}
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate('AddCustomer')}
+        >
+          <Icon name="add-circle" size={22} color={Colors.white} />
+          <Text style={styles.addButtonText}>Add Customer</Text>
+        </TouchableOpacity>
       </ScrollView>
-
-      {/* Floating Add Customer Button */}
-      <TouchableOpacity style={styles.floatingAddButton}  onPress={() => navigation.navigate('AddCustomer')}>
-        <Icon name="add" size={20} color={Colors.white} />
-        <Text style={styles.floatingAddButtonText}>Add Customer</Text>
-      </TouchableOpacity>
-
-
     </SafeAreaView>
   );
 };
@@ -147,16 +147,17 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingHorizontal: Spacing.lg,
-    paddingBottom: 150,
+    paddingBottom: Spacing.xxl,
     paddingTop: Spacing.md,
   },
   customerCard: {
     backgroundColor: Colors.white,
     padding: Spacing.md,
-    borderRadius: BorderRadius.lg,
+    borderRadius: BorderRadius.md,
     marginBottom: Spacing.md,
     shadowColor: '#000',
     shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
     elevation: 2,
     borderLeftWidth: 5,
@@ -174,10 +175,14 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
     marginLeft: Spacing.sm,
   },
-  companyText: {
+  detailText: {
     fontSize: FontSizes.small,
     color: Colors.black80,
     marginTop: Spacing.xs,
+  },
+  detailValue: {
+    fontWeight: FontWeights.medium,
+    color: Colors.black,
   },
   customerIdText: {
     fontSize: FontSizes.xs,
@@ -196,46 +201,26 @@ const styles = StyleSheet.create({
     color: Colors.black80,
     marginTop: 2,
   },
-  floatingAddButton: {
-    position: 'absolute',
-    right: Spacing.lg,
-    bottom: 100,
-    backgroundColor: Colors.primary,
+  addButton: {
+    marginTop: Spacing.lg,
     flexDirection: 'row',
+    backgroundColor: Colors.primary,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.lg,
+    alignSelf: 'center',
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 4,
   },
-  floatingAddButtonText: {
+  addButtonText: {
     color: Colors.white,
     fontSize: FontSizes.medium,
     fontWeight: FontWeights.bold,
-    marginLeft: Spacing.xs,
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: Spacing.sm,
-    backgroundColor: Colors.white,
-    borderTopWidth: 1,
-    borderTopColor: Colors.lightGray,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  navItem: {
-    alignItems: 'center',
-    padding: Spacing.sm,
-  },
-  navText: {
-    fontSize: FontSizes.small,
-    color: '#444',
+    marginLeft: Spacing.sm,
   },
 });
 
